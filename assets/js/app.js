@@ -19,6 +19,7 @@ function showApp(profile,user){
  document.querySelector(".user-mini b").textContent=display;
  document.querySelector(".user-mini small").textContent=profile?.role==="owner"?"Owner account":"Cashier account";
  document.querySelector("#topAvatar").textContent=display.slice(0,1).toUpperCase();
+ document.querySelectorAll("[data-owner-only]").forEach(node=>{node.style.display=currentRole==="owner"?"":"none";});
  let savedView="overview";
  try{
   const candidate=sessionStorage.getItem("drinkflow:lastView");
@@ -110,6 +111,7 @@ async function loadOverview(){
 }
 async function loadReports(){
  const page=document.querySelector("#pageContent");
+ if(currentRole!=="owner"){page.innerHTML='<div class="panel"><h2>Akses Owner diperlukan</h2><p>Laporan penjualan hanya tersedia untuk Owner.</p></div>';return;}
  page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID</div><h1>Reports</h1><p>Laporan 7 hari terakhir · transaksi completed saja.</p></div><button class="secondary-button" id="refreshReports">↻ Refresh</button></div><div class="panel">Memuat laporan...</div>';
  const [o,ch]=await Promise.all([
   supabaseClient.from("orders").select("id,total_amount,platform_fee,net_amount,channel_id,ordered_at").eq("order_status","completed").gte("ordered_at",dfStart(-6)).lt("ordered_at",dfStart(1)).order("ordered_at",{ascending:true}),
@@ -125,6 +127,7 @@ async function loadReports(){
 }
 async function loadProducts(){
  const page=document.querySelector("#pageContent");
+ if(currentRole!=="owner"){page.innerHTML='<div class="panel"><h2>Akses Owner diperlukan</h2><p>Pengelolaan produk hanya tersedia untuk Owner.</p></div>';return;}
  page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID</div><h1>Products</h1><p>Memuat katalog produk...</p></div></div><div class="panel">Mengambil data dari Supabase...</div>';
  const [{data:products,error:productError},{data:channels,error:channelError}]=await Promise.all([
   supabaseClient.from("products").select("*").order("created_at",{ascending:true}),
@@ -303,13 +306,14 @@ async function loadOrders(){
   const labels={pending:"Menunggu pembayaran",processing:"Diproses",completed:"Selesai",cancelled:"Dibatalkan"};
   const date=o.created_at?new Intl.DateTimeFormat("id-ID",{dateStyle:"medium",timeStyle:"short",timeZone:"Asia/Jakarta"}).format(new Date(o.created_at)):"—";
   const payment={cash:"Tunai",qris:"QRIS",transfer:"Transfer"}[o.payment_method]||o.payment_method||"—";
-  return '<article class="order-card"><div class="order-card-top"><div><strong>'+escapeHtml(o.order_number)+'</strong><small>'+escapeHtml(channelMap.get(o.channel_id)||"Channel")+' · '+date+'</small></div><span class="order-status '+escapeHtml(o.order_status)+'">'+escapeHtml(labels[o.order_status]||o.order_status)+'</span></div><div class="order-items">'+(lines||"<small>Detail item tidak tersedia.</small>")+'</div><div class="order-totals"><span>Total <b>'+money(o.total_amount)+'</b></span><span>Komisi <b>'+money(o.platform_fee)+'</b></span><span>Estimasi diterima <b>'+money(o.net_amount)+'</b></span></div><div class="order-card-bottom"><small>Pembayaran: '+escapeHtml(payment)+'</small>'+(o.order_status==="pending"?'<button class="primary-button confirm-payment" data-confirm-order="'+o.id+'">Konfirmasi pembayaran</button>':'')+'</div>'+(o.notes?'<p class="order-notes">Catatan: '+escapeHtml(o.notes)+'</p>':'')+'</article>';
+  return '<article class="order-card"><div class="order-card-top"><div><strong>'+escapeHtml(o.order_number)+'</strong><small>'+escapeHtml(channelMap.get(o.channel_id)||"Channel")+' · '+date+'</small></div><span class="order-status '+escapeHtml(o.order_status)+'">'+escapeHtml(labels[o.order_status]||o.order_status)+'</span></div><div class="order-items">'+(lines||"<small>Detail item tidak tersedia.</small>")+'</div><div class="order-totals"><span>Total <b>'+money(o.total_amount)+'</b></span><span>Komisi <b>'+money(o.platform_fee)+'</b></span><span>Estimasi diterima <b>'+money(o.net_amount)+'</b></span></div><div class="order-card-bottom"><small>Pembayaran: '+escapeHtml(payment)+'</small>'+(o.order_status==="pending"&&currentRole==="owner"?'<button class="primary-button confirm-payment" data-confirm-order="'+o.id+'">Konfirmasi pembayaran</button>':(o.order_status==="pending"&&currentRole!=="owner"?'<small class="muted">Menunggu konfirmasi Owner</small>':''))+'</div>'+(o.notes?'<p class="order-notes">Catatan: '+escapeHtml(o.notes)+'</p>':'')+'</article>';
  }).join("");
  page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID</div><h1>Orders</h1><p>Kelola transaksi dan konfirmasi pembayaran.</p></div><button class="secondary-button" id="refreshOrders">↻ Refresh</button></div><div class="order-summary"><div class="order-summary-card"><small>Total transaksi terbaru</small><strong>'+orders.length+'</strong></div><div class="order-summary-card"><small>Menunggu konfirmasi</small><strong>'+pending+'</strong></div><div class="order-summary-card"><small>Selesai</small><strong>'+orders.filter(o=>o.order_status==="completed").length+'</strong></div></div><div class="orders-list">'+(rows||'<div class="panel order-empty">Belum ada transaksi. Buat pesanan pertama dari Point of Sale.</div>')+'</div>';
  document.querySelector("#refreshOrders").addEventListener("click",loadOrders);
  document.querySelectorAll("[data-confirm-order]").forEach(b=>b.addEventListener("click",()=>confirmPayment(b.dataset.confirmOrder,b)));
 }
 async function confirmPayment(orderId,button){
+ if(currentRole!=="owner"){notify("Konfirmasi pembayaran hanya dapat dilakukan Owner.");return;}
  if(!window.confirm("Pastikan pembayaran sudah benar-benar diterima. Konfirmasi transaksi ini?"))return;
  button.disabled=true;button.textContent="Mengonfirmasi...";
  try{
@@ -617,7 +621,10 @@ async function loadSettings(){
  page.querySelector("#refreshCashiers").onclick=refreshList;
  await refreshList();
 }
-function navigate(view){if(view!=="pos")cleanupPOSOverlays();try{sessionStorage.setItem("drinkflow:lastView",view);}catch(error){}document.querySelector("#breadcrumbTitle").textContent=labels[view]||"Overview";document.querySelectorAll(".nav-link[data-view]").forEach(button=>button.classList.toggle("active",button.dataset.view===view));document.querySelector("#sidebar").classList.remove("open");if(view==="products"){loadProducts();return;}if(view==="pos"){loadPOS();return;}if(view==="orders"){loadOrders();return;}if(view==="purchasing"){loadPurchasing();return;}if(view==="inventory"){loadInventory();return;}if(view==="costRecipe"){loadCostRecipe();return;}if(view==="overview"){loadOverview();return;}if(view==="reports"){loadReports();return;}if(view==="settings"){loadSettings();return;}if(view!=="overview"){notify((labels[view]||view)+" module sedang disiapkan.");return;}}
+function navigate(view){
+ const ownerOnlyViews=["products","inventory","purchasing","costRecipe","expenses","finance","reports","settings"];
+ if(currentRole!=="owner"&&ownerOnlyViews.includes(view)){notify("Menu ini hanya tersedia untuk Owner.");return;}
+ if(view!=="pos")cleanupPOSOverlays();try{sessionStorage.setItem("drinkflow:lastView",view);}catch(error){}document.querySelector("#breadcrumbTitle").textContent=labels[view]||"Overview";document.querySelectorAll(".nav-link[data-view]").forEach(button=>button.classList.toggle("active",button.dataset.view===view));document.querySelector("#sidebar").classList.remove("open");if(view==="products"){loadProducts();return;}if(view==="pos"){loadPOS();return;}if(view==="orders"){loadOrders();return;}if(view==="purchasing"){loadPurchasing();return;}if(view==="inventory"){loadInventory();return;}if(view==="costRecipe"){loadCostRecipe();return;}if(view==="overview"){loadOverview();return;}if(view==="reports"){loadReports();return;}if(view==="settings"){loadSettings();return;}if(view!=="overview"){notify((labels[view]||view)+" module sedang disiapkan.");return;}}
 document.querySelectorAll("[data-view]").forEach(button=>button.addEventListener("click",()=>navigate(button.dataset.view)));
 document.querySelector("#mobileMenu").addEventListener("click",()=>document.querySelector("#sidebar").classList.toggle("open"));
 if(initSupabase()){
