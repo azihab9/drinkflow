@@ -30,4 +30,4 @@ jobs:
       - name: Deploy cashier authentication function
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-        run: supabase functions deploy cashier-auth --no-verify-jwt
+        run: supabase functions deploy cashier-auth --no-verify-jwt --yes
