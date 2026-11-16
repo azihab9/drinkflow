@@ -273,3 +273,49 @@ body{background:linear-gradient(135deg,#f7f9f5,#f1f6ef 55%,#f8f7f1);color:var(--
 .order-card,.purchase-card,.order-summary-card{border-radius:15px;box-shadow:0 5px 20px rgba(39,70,43,.035)}.order-card:hover,.purchase-card:hover{border-color:#d8e7d6}
 .auth-card{border-radius:24px;box-shadow:0 28px 90px rgba(39,73,45,.11)}
 @media(max-width:760px){.sidebar{box-shadow:18px 0 55px rgba(31,55,35,.13)}.topbar{height:62px;padding:0 15px}.page-content{padding:23px 15px 22px}.welcome-row{gap:16px;margin-bottom:21px}.welcome-row h1{font-size:29px}.metric-grid{gap:10px}.metric-card{padding:15px;min-height:120px;border-radius:13px}.metric-card>strong{font-size:23px;margin-top:12px}.panel{padding:17px;border-radius:14px}.content-grid,.bottom-grid{gap:12px;margin-bottom:12px}}
+
+
+/* DrinkFlow colorful matcha palette */
+:root{
+ --df-matcha:#477b52;--df-matcha-deep:#28583a;--df-mint:#e4f3e8;
+ --df-citrus:#e8b94f;--df-peach:#e99a79;--df-lilac:#9b8acb;--df-sky:#79aeca;
+ --df-ink:#23372a;
+}
+body{background:radial-gradient(ellipse at 8% 0%,rgba(196,229,198,.48),transparent 32%),radial-gradient(ellipse at 94% 12%,rgba(250,224,185,.34),transparent 28%),linear-gradient(145deg,#f6f8f3 0%,#eef5ef 52%,#f8f5ef 100%)}
+.sidebar{background:linear-gradient(180deg,#fff 0%,#f8fbf7 100%)}
+.brand-mark{background:linear-gradient(145deg,#d5efc9 0%,#9dce91 48%,#6fa77a 100%);box-shadow:0 7px 18px rgba(75,133,82,.22)}
+.nav-link.active{background:linear-gradient(100deg,#e0f1e2,#edf6e9 70%,#f8f7ed);color:#28583a;box-shadow:inset 3px 0 #6ea878}
+.welcome-row .eyebrow{background:linear-gradient(110deg,#e7f4e7,#f7f3e8);border-color:#dcebd9;color:#527b56}
+.welcome-row h1{color:#263c2d}
+.primary-button{background:linear-gradient(130deg,#70a879,#477e55);color:#fff;box-shadow:0 8px 19px rgba(63,119,75,.2)}
+.primary-button:hover{background:linear-gradient(130deg,#7eb887,#568d62)}
+.metric-card{border-top:3px solid var(--metric-accent,#91bc91);background:linear-gradient(145deg,var(--metric-tint,#fff) 0%,#fff 74%)}
+.metric-card:nth-child(1){--metric-accent:#6eaa78;--metric-tint:#eff8ee}
+.metric-card:nth-child(2){--metric-accent:#e6b65a;--metric-tint:#fff8e9}
+.metric-card:nth-child(3){--metric-accent:#80a9c5;--metric-tint:#eef6fb}
+.metric-card:nth-child(4){--metric-accent:#a393ca;--metric-tint:#f5f1fb}
+.metric-card:after{background:var(--metric-accent);opacity:.12}
+.metric-card:nth-child(1) .metric-icon{background:#e1f1e2;color:#477d50}
+.metric-card:nth-child(2) .metric-icon{background:#fff0ce;color:#a87520}
+.metric-card:nth-child(3) .metric-icon{background:#e4f0f8;color:#4c83a7}
+.metric-card:nth-child(4) .metric-icon{background:#eee8f8;color:#7967a8}
+.panel{background:linear-gradient(150deg,#fff 0%,#fdfefc 100%)}
+.panel-heading h2{color:#294331}
+.channel-badge{background:linear-gradient(145deg,#e3f2e4,#d8e9d9);color:#477a50}
+.channel-row:nth-child(2n) .channel-badge{background:#fff0d7;color:#a87628}
+.channel-row:nth-child(3n) .channel-badge{background:#e9e4f7;color:#7866a6}
+.getting-started{background:radial-gradient(circle at 94% 8%,rgba(235,195,106,.3),transparent 30%),radial-gradient(circle at 5% 100%,rgba(128,184,136,.22),transparent 38%),linear-gradient(125deg,#eaf5e9,#f7f3e8)}
+.product-item{border:1px solid #e9efe6;background:linear-gradient(110deg,#f5faf3,#fff)}
+.product-item:nth-child(3n+2){background:linear-gradient(110deg,#fff8ed,#fff)}
+.product-item:nth-child(3n){background:linear-gradient(110deg,#f4f0fb,#fff)}
+.pos-product{background:linear-gradient(145deg,#fff,#f2f8f0);border-color:#dfeade}
+.pos-product:nth-child(3n+2){background:linear-gradient(145deg,#fffaf0,#fff);border-color:#f0e6cf}
+.pos-product:nth-child(3n){background:linear-gradient(145deg,#f7f3fc,#fff);border-color:#e8e0f2}
+.data-table th{background:linear-gradient(90deg,#edf5ed,#f8f6ed);color:#58715c}
+.data-table tbody tr:nth-child(even){background:#fbfdf9}
+.data-table tbody tr:hover{background:#f0f7ef}
+.date-chip{background:linear-gradient(110deg,#f3f8f1,#fff)}
+.store-status{background:linear-gradient(120deg,#eaf5e9,#f9f3e7);border-color:#dfebdc}
+.secondary-button{border-color:#dce8dc;background:#f7faf6;color:#49694d}
+.secondary-button:hover{background:#edf6ec;border-color:#c8ddc9}
+@media(max-width:760px){body{background:linear-gradient(160deg,#f3f7f0,#f7f5ef)}.metric-card{border-top-width:3px}}
