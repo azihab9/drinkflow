@@ -319,3 +319,61 @@ body{background:radial-gradient(ellipse at 8% 0%,rgba(196,229,198,.48),transpare
 .secondary-button{border-color:#dce8dc;background:#f7faf6;color:#49694d}
 .secondary-button:hover{background:#edf6ec;border-color:#c8ddc9}
 @media(max-width:760px){body{background:linear-gradient(160deg,#f3f7f0,#f7f5ef)}.metric-card{border-top-width:3px}}
+
+
+/* DrinkFlow bold color treatment */
+:root{
+ --df-forest:#174b32;--df-green:#2f8b50;--df-lime:#b6d943;
+ --df-orange:#f39a36;--df-blue:#398fc2;--df-purple:#8061bb;--df-pink:#e87991;
+}
+body{
+ background:
+ radial-gradient(ellipse at 0% 0%,rgba(182,217,67,.24),transparent 30%),
+ radial-gradient(ellipse at 100% 12%,rgba(57,143,194,.17),transparent 27%),
+ linear-gradient(135deg,#edf3e9 0%,#f4f1e8 52%,#eaf1f5 100%);
+}
+.sidebar{background:linear-gradient(180deg,#173f2c 0%,#20583a 58%,#17452f 100%);border-right:0;color:#f5fff5}
+.brand{color:#fff}.brand small,.sidebar .muted,.sidebar small{color:#c3d9c8}
+.brand-mark{background:linear-gradient(145deg,#d4ef63,#83c84c);color:#173f2c;box-shadow:0 8px 20px rgba(0,0,0,.2)}
+.nav-link{color:#d2e5d6}
+.nav-link:hover{background:rgba(255,255,255,.12);color:#fff}
+.nav-link.active{background:linear-gradient(100deg,#c3e85b,#8fce55);color:#173f2c;box-shadow:0 7px 18px rgba(7,35,19,.2);font-weight:800}
+.store-status{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.17);color:#f4fff4}
+.store-status *{color:inherit}
+.topbar{background:rgba(255,255,255,.94);border-bottom:1px solid #dce6da}
+.welcome-row .eyebrow{background:#e2f1c5;border:1px solid #c8e39b;color:#315f31;font-weight:800}
+.welcome-row h1{color:#173f2c}
+.primary-button{background:linear-gradient(120deg,#2f8b50,#17613a);color:white;border:0;box-shadow:0 8px 20px rgba(30,105,58,.28);font-weight:800}
+.primary-button:hover{background:linear-gradient(120deg,#3b9d5d,#1e7045);color:#fff}
+.metric-card{border:0;border-radius:18px;color:#fff;box-shadow:0 12px 26px rgba(28,59,35,.13)}
+.metric-card:nth-child(1){background:linear-gradient(135deg,#237748,#48a866)}
+.metric-card:nth-child(2){background:linear-gradient(135deg,#d77b19,#f2ad3f)}
+.metric-card:nth-child(3){background:linear-gradient(135deg,#287eae,#54acd0)}
+.metric-card:nth-child(4){background:linear-gradient(135deg,#7052a8,#a18ad5)}
+.metric-card .metric-top,.metric-card>strong,.metric-card small,.metric-card .muted{color:#fff!important}
+.metric-card>strong{font-weight:850;text-shadow:0 1px 1px rgba(0,0,0,.08)}
+.metric-card:after{background:rgba(255,255,255,.18);opacity:1}
+.metric-icon{background:rgba(255,255,255,.2)!important;color:#fff!important}
+.panel{border:1px solid #e0e9dd;box-shadow:0 8px 24px rgba(35,67,39,.055)}
+.panel-heading h2{color:#174b32}
+.channel-badge{background:#dff0bd;color:#285a32;font-weight:850}
+.channel-row:nth-child(2n) .channel-badge{background:#ffe5bd;color:#9b5712}
+.channel-row:nth-child(3n) .channel-badge{background:#e5dcfa;color:#5f4596}
+.getting-started{background:linear-gradient(120deg,#d9efad 0%,#b8df9c 45%,#f6d78e 100%);border:0;color:#20452b}
+.getting-started h2,.getting-started p,.getting-started small{color:#20452b}
+.product-item{background:#e8f3df;border:1px solid #d1e6c4}
+.product-item:nth-child(3n+2){background:#fff0d8;border-color:#f5dfb7}
+.product-item:nth-child(3n){background:#e9e2f8;border-color:#ded3f2}
+.pos-product{background:linear-gradient(145deg,#e6f4df,#fff);border:1px solid #cce4c5}
+.pos-product:nth-child(3n+2){background:linear-gradient(145deg,#fff0d7,#fff);border-color:#f0d8aa}
+.pos-product:nth-child(3n){background:linear-gradient(145deg,#e9e2f8,#fff);border-color:#d9cef0}
+.data-table th{background:#dcebcf;color:#315d37}
+.data-table tbody tr:nth-child(even){background:#f3f8ef}
+.data-table tbody tr:hover{background:#e5f2dc}
+.secondary-button{background:#e6f1df;border:1px solid #cfe2c6;color:#285c36;font-weight:700}
+.secondary-button:hover{background:#d8ebce;border-color:#b8d6ad}
+.date-chip{background:#eaf3e4;border-color:#d5e5cf;color:#315b39}
+@media(max-width:760px){
+ .sidebar{background:linear-gradient(180deg,#173f2c,#20583a);box-shadow:18px 0 55px rgba(12,42,24,.3)}
+ .metric-card{border-radius:15px}
+}
