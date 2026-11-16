@@ -100,3 +100,9 @@ body{background:var(--bg);color:var(--text)}
 footer{color:#8b978e}
 .toast{background:#203a29;color:#f3fff4}
 @media(max-width:760px){.sidebar{background:#fbfdfb}.topbar{background:#fff}}
+
+.table-wrap{width:100%;overflow-x:auto}
+.data-table{width:100%;border-collapse:collapse;text-align:left;min-width:420px}
+.data-table th{font-size:12px;color:#77877b;font-weight:700;padding:13px 12px;border-bottom:1px solid var(--line)}
+.data-table td{font-size:14px;color:var(--text);padding:15px 12px;border-bottom:1px solid #edf1ed}
+.product-status{display:inline-flex;padding:5px 9px;border-radius:20px;background:#e8f3e9;color:#4e895b;font-size:11px;font-weight:700}
