@@ -893,3 +893,72 @@ html,body,.app-shell,.main-area,.page-content{background:#fff!important;color:va
 .panel:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(53,68,56,.075)!important}
 .pos-product:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 9px 20px rgba(53,68,56,.09)!important;border-color:#B7C9AE!important}
 @media(max-width:760px){.sidebar{background:linear-gradient(180deg,#587A55,#6F9068)!important}}
+
+
+/* Global sticky workspace header */
+.main-area{min-width:0}
+.topbar{position:sticky;top:0;z-index:35}
+
+/* Mobile POS: fixed order summary + slide-up cart sheet */
+.pos-mobile-cartbar,.pos-cart-backdrop,.pos-cart-close{display:none}
+@media(max-width:760px){
+ .topbar{height:58px;padding:0 13px;box-shadow:0 2px 10px rgba(35,55,44,.045)}
+ .breadcrumb{font-size:11px;gap:8px}
+ .top-actions{gap:8px}
+ .logout-button{padding:7px 9px;font-size:11px}
+ .page-content{padding:20px 13px 105px}
+ .pos-welcome{margin-bottom:17px}
+ .pos-welcome h1{font-size:25px}
+ .pos-layout{display:block}
+ .pos-menu-panel{padding:14px 11px 18px}
+ .pos-toolbar{display:flex;flex-direction:row;align-items:center;gap:9px;margin-bottom:14px}
+ .pos-toolbar h2{font-size:14px}
+ .pos-toolbar p{font-size:10px;line-height:1.35}
+ .pos-select{padding:10px 9px;font-size:12px;min-width:0}
+ .pos-toolbar .pos-select{width:46%;max-width:175px;flex-shrink:0}
+ .pos-products-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .pos-product{min-height:112px;padding:12px 10px;border-radius:12px;gap:8px}
+ .pos-product-name{font-size:12px;line-height:1.35}
+ .pos-product small{font-size:9px}
+ .pos-product strong{font-size:12px}
+ .pos-cart-panel{
+  display:block;position:fixed!important;z-index:61;left:0;right:0;bottom:0;top:auto!important;
+  width:100%;max-height:min(84dvh,760px);overflow-y:auto;overscroll-behavior:contain;
+  border-radius:20px 20px 0 0!important;padding:18px 16px calc(18px + env(safe-area-inset-bottom));
+  background:#fff!important;box-shadow:0 -14px 45px rgba(30,49,39,.18)!important;
+  transform:translateY(110%);visibility:hidden;transition:transform .28s cubic-bezier(.2,.8,.2,1),visibility .28s;
+ }
+ .pos-cart-panel.is-open{transform:translateY(0);visibility:visible}
+ .pos-cart-panel .panel-heading{position:sticky;top:-18px;background:#fff;padding:3px 0 12px;margin:0 0 12px;z-index:2;border-bottom:1px solid #edf1ed}
+ .pos-cart-heading-actions{display:flex;align-items:center;gap:12px}
+ .pos-cart-close{display:grid;place-items:center;width:32px;height:32px;border:0;border-radius:50%;background:#eef3e9;color:#496746;font-size:23px;line-height:1}
+ .cart-items{max-height:26dvh;overflow:auto}
+ .cart-line{grid-template-columns:minmax(0,1fr) auto;align-items:center}
+ .cart-line>strong{grid-column:auto;text-align:right}
+ .payment-label{margin-top:12px}
+ .checkout-button{margin-top:14px;min-height:48px}
+ .pos-footnote{padding-bottom:3px}
+ .pos-cart-backdrop{display:block;position:fixed;inset:0;z-index:60;background:rgba(25,39,31,.38);opacity:0;visibility:hidden;transition:opacity .25s ease,visibility .25s}
+ .pos-cart-backdrop.is-visible{opacity:1;visibility:visible}
+ .pos-mobile-cartbar{
+  display:flex;position:fixed;z-index:45;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));
+  min-height:62px;padding:8px 9px 8px 13px;border-radius:16px;
+  background:#344F5B;color:#fff;align-items:center;justify-content:space-between;
+  box-shadow:0 9px 28px rgba(35,55,44,.23);border:1px solid rgba(255,255,255,.13)
+ }
+ .pos-mobile-cart-info{display:flex;align-items:center;gap:10px;min-width:0}
+ .pos-mobile-cart-count{display:grid;place-items:center;width:34px;height:34px;flex-shrink:0;border-radius:11px;background:#E7F0ED;color:#344F5B;font-size:15px;font-weight:800}
+ .pos-mobile-cart-info b{display:block;font-size:12px}
+ .pos-mobile-cart-info small{display:block;margin-top:3px;color:#DCE7E5;font-size:10px;white-space:nowrap}
+ .pos-mobile-cartbar>button{border:0;border-radius:11px;background:#6F9690;color:#fff;padding:12px 14px;font-size:12px;font-weight:800;white-space:nowrap}
+ .pos-mobile-cartbar>button span{margin-left:5px}
+ .pos-mobile-cartbar:not(.has-items)>button{opacity:.85}
+ body.pos-sheet-open{overflow:hidden}
+}
+@media(max-width:380px){
+ .pos-toolbar{align-items:flex-start}
+ .pos-toolbar .pos-select{width:44%;font-size:11px}
+ .pos-product{min-height:105px;padding:10px 9px}
+ .pos-mobile-cartbar{left:9px;right:9px}
+ .pos-mobile-cartbar>button{padding:11px 10px}
+}
