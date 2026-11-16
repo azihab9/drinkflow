@@ -628,3 +628,36 @@ body{background:#fff!important;color:#26382F}
 .secondary-button:hover{background:#DCE9DF!important;border-color:#BFD3C3!important}
 .welcome-row .eyebrow{background:#EEF4EF!important;border-color:#DCE8DE!important;color:#527B63!important}
 .welcome-row h1 em{color:#668C72!important}
+
+
+/* DrinkFlow Sage Green — richer muted green, not washed out */
+:root{
+ --df-sage:#78947B;
+ --df-sage-deep:#5E7964;
+ --df-sage-dark:#496653;
+ --df-sage-light:#DCE7DC;
+ --df-sage-pale:#EEF3ED;
+}
+.sidebar{background:linear-gradient(180deg,#78947B 0%,#66836D 100%)!important}
+.brand-mark{background:#E5EDE3!important;color:#496653!important}
+.nav-link{color:#F2F6F1!important}
+.nav-link:hover{background:rgba(255,255,255,.15)!important;color:#fff!important}
+.nav-link.active{background:#E4ECE2!important;color:#496653!important;box-shadow:inset 3px 0 #D8794A!important}
+.store-status{background:rgba(255,255,255,.13)!important;border-color:rgba(255,255,255,.22)!important}
+.primary-button{background:#78947B!important;color:#fff!important;box-shadow:0 7px 18px rgba(73,102,83,.2)!important}
+.primary-button:hover{background:#5E7964!important}
+.metric-card,.metric-card:nth-child(1),.metric-card:nth-child(4){background:linear-gradient(135deg,#66856D,#89A18B)!important}
+.metric-card:nth-child(2){background:linear-gradient(135deg,#C87955,#D99470)!important}
+.metric-card:nth-child(3){background:linear-gradient(135deg,#81749D,#9A8CB3)!important}
+.channel-badge,.channel-row:nth-child(n) .channel-badge{background:#E4ECE2!important;color:#496653!important}
+.getting-started{background:linear-gradient(120deg,#E7EEE5,#F3F5F0)!important;border-color:#D7E2D6!important}
+.setup-progress{background:#DCE6DA!important}.setup-progress span{background:#78947B!important}
+.product-item,.product-item:nth-child(n){background:#F1F5F0!important;border-color:#DCE6DA!important}
+.product-item span:last-child,.text-button{color:#5E7964!important}
+.pos-product,.pos-product:nth-child(n){border-color:#DCE6DA!important}
+.data-table th{background:#E7EEE5!important;color:#496653!important}
+.data-table tbody tr:hover{background:#F0F5EF!important}
+.secondary-button{background:#E7EEE5!important;border-color:#D4E0D3!important;color:#496653!important}
+.secondary-button:hover{background:#DCE7DC!important;border-color:#B9CDBB!important}
+.welcome-row .eyebrow{background:#EAF0E8!important;border-color:#D8E3D7!important;color:#5E7964!important}
+.welcome-row h1 em{color:#78947B!important}
