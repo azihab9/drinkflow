@@ -577,7 +577,40 @@ function openRecipeEditor(product,ingredients,activeRecipe,currentLines){
  };
 }
 
-function navigate(view){if(view!=="pos")cleanupPOSOverlays();try{sessionStorage.setItem("drinkflow:lastView",view);}catch(error){}document.querySelector("#breadcrumbTitle").textContent=labels[view]||"Overview";document.querySelectorAll(".nav-link[data-view]").forEach(button=>button.classList.toggle("active",button.dataset.view===view));document.querySelector("#sidebar").classList.remove("open");if(view==="products"){loadProducts();return;}if(view==="pos"){loadPOS();return;}if(view==="orders"){loadOrders();return;}if(view==="purchasing"){loadPurchasing();return;}if(view==="inventory"){loadInventory();return;}if(view==="costRecipe"){loadCostRecipe();return;}if(view==="overview"){loadOverview();return;}if(view==="reports"){loadReports();return;}if(view!=="overview"){notify((labels[view]||view)+" module sedang disiapkan.");return;}}
+async function loadSettings(){
+ const page=document.querySelector("#pageContent");
+ if(currentRole!=="owner"){page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">DRINKFLOW SETTINGS</div><h1>Settings</h1><p>Pengaturan akun hanya tersedia untuk Owner.</p></div></div><div class="panel"><h2>Akses Owner diperlukan</h2></div>';return;}
+ page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID · ACCESS CONTROL</div><h1>Settings</h1><p>Kelola akun kasir dan akses operasional.</p></div></div><div class="panel cashier-management"><div class="panel-heading"><div><h2>Tambah akun kasir</h2><p>Kasir masuk menggunakan ID dan PIN 6 digit, tanpa email.</p></div></div><form id="createCashierForm" class="cashier-create-form"><label>Nama kasir<input name="full_name" required maxlength="80" placeholder="Nama lengkap kasir"></label><label>ID kasir<input name="cashier_code" required maxlength="11" pattern="KSR[0-9]{3,8}" placeholder="KSR001" value="KSR001"></label><label>PIN 6 digit<input name="pin" required type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" placeholder="••••••"></label><button class="primary-button" type="submit" id="createCashierButton">＋ Buat akun kasir</button><p class="editor-message" id="cashierCreateMessage"></p></form></div><div class="panel"><div class="panel-heading"><div><h2>Daftar akun kasir</h2><p>Aktifkan atau nonaktifkan akses kasir.</p></div><button class="secondary-button" id="refreshCashiers">↻ Refresh</button></div><div id="cashierList" class="cashier-list">Memuat akun...</div></div>';
+ const form=page.querySelector("#createCashierForm"),message=page.querySelector("#cashierCreateMessage"),button=page.querySelector("#createCashierButton");
+ async function refreshList(){
+  const list=page.querySelector("#cashierList");list.textContent="Memuat akun...";
+  const {data,error}=await supabaseClient.functions.invoke("cashier-auth",{body:{action:"list"}});
+  if(error||data?.error){list.textContent="Gagal memuat: "+(data?.error||error.message);return;}
+  const rows=data.cashiers||[];
+  list.innerHTML=rows.length?rows.map(x=>{
+   const profile=Array.isArray(x.profiles)?x.profiles[0]:x.profiles;
+   return '<div class="cashier-row"><div><strong>'+escapeHtml(profile?.full_name||"Kasir")+'</strong><small>'+escapeHtml(x.cashier_code)+'</small></div><span class="cashier-status '+(x.is_active?"active":"inactive")+'">'+(x.is_active?"Aktif":"Nonaktif")+'</span><button type="button" class="secondary-button" data-cashier-toggle="'+escapeHtml(x.cashier_code)+'" data-active="'+(!x.is_active)+'">'+(x.is_active?"Nonaktifkan":"Aktifkan")+'</button></div>';
+  }).join(""):'<p class="empty-state">Belum ada akun kasir.</p>';
+  list.querySelectorAll("[data-cashier-toggle]").forEach(btn=>btn.addEventListener("click",async()=>{
+   btn.disabled=true;
+   const {data,error}=await supabaseClient.functions.invoke("cashier-auth",{body:{action:"set_active",cashier_code:btn.dataset.cashierToggle,is_active:btn.dataset.active==="true"}});
+   if(error||data?.error){notify("Gagal mengubah status: "+(data?.error||error.message));btn.disabled=false;return;}
+   notify("Status akun kasir diperbarui.");refreshList();
+  }));
+ }
+ form.addEventListener("submit",async event=>{
+  event.preventDefault();const fd=new FormData(form),payload={action:"create",full_name:String(fd.get("full_name")||"").trim(),cashier_code:String(fd.get("cashier_code")||"").trim().toUpperCase(),pin:String(fd.get("pin")||"")};
+  button.disabled=true;button.textContent="Membuat akun...";message.textContent="";
+  const {data,error}=await supabaseClient.functions.invoke("cashier-auth",{body:payload});
+  if(error||data?.error){message.textContent="Gagal membuat akun: "+(data?.error||error.message);button.disabled=false;button.textContent="＋ Buat akun kasir";return;}
+  message.textContent="Akun "+data.cashier_code+" berhasil dibuat.";
+  form.reset();form.elements.cashier_code.value="KSR001";
+  button.disabled=false;button.textContent="＋ Buat akun kasir";refreshList();
+ });
+ page.querySelector("#refreshCashiers").onclick=refreshList;
+ await refreshList();
+}
+function navigate(view){if(view!=="pos")cleanupPOSOverlays();try{sessionStorage.setItem("drinkflow:lastView",view);}catch(error){}document.querySelector("#breadcrumbTitle").textContent=labels[view]||"Overview";document.querySelectorAll(".nav-link[data-view]").forEach(button=>button.classList.toggle("active",button.dataset.view===view));document.querySelector("#sidebar").classList.remove("open");if(view==="products"){loadProducts();return;}if(view==="pos"){loadPOS();return;}if(view==="orders"){loadOrders();return;}if(view==="purchasing"){loadPurchasing();return;}if(view==="inventory"){loadInventory();return;}if(view==="costRecipe"){loadCostRecipe();return;}if(view==="overview"){loadOverview();return;}if(view==="reports"){loadReports();return;}if(view==="settings"){loadSettings();return;}if(view!=="overview"){notify((labels[view]||view)+" module sedang disiapkan.");return;}}
 document.querySelectorAll("[data-view]").forEach(button=>button.addEventListener("click",()=>navigate(button.dataset.view)));
 document.querySelector("#mobileMenu").addEventListener("click",()=>document.querySelector("#sidebar").classList.toggle("open"));
 if(initSupabase()){
