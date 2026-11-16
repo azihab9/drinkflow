@@ -176,6 +176,7 @@ async function loadPOS(){
 }
 function posPrice(productId,channelId){const found=posState.prices.find(x=>x.product_id===productId&&x.channel_id===channelId);return found?Number(found.price):null;}
 function renderPOS(){
+ cleanupPOSOverlays();
  const page=document.querySelector("#pageContent");
  const channelOptions=posState.channels.map(c=>'<option value="'+c.id+'" '+(posState.channel?.id===c.id?'selected':'')+'>'+escapeHtml(c.name)+' · Komisi '+Number(c.commission_rate||0)+'%</option>').join("");
  const productCards=posState.products.map(p=>{
@@ -184,6 +185,9 @@ function renderPOS(){
   return '<button class="pos-product '+(unavailable?'unavailable':'')+'" data-add-cart="'+p.id+'" '+(unavailable?'disabled':'')+'><span class="pos-product-name">'+escapeHtml(p.name)+'</span><small>'+escapeHtml(p.sku)+'</small><strong>'+(unavailable?'Harga belum diatur':money(price))+'</strong></button>';
  }).join("");
  page.innerHTML='<div class="welcome-row pos-welcome"><div><div class="eyebrow">MATCHABOY PASID · CASHIER</div><h1>Point of Sale</h1><p>Pilih channel, tambahkan menu, lalu catat transaksi.</p></div></div><div class="pos-layout"><section class="panel pos-menu-panel"><div class="pos-toolbar"><div><h2>Pilih channel penjualan</h2><p>Harga mengikuti channel yang dipilih.</p></div><select id="posChannel" class="pos-select">'+channelOptions+'</select></div><div class="pos-products-grid">'+(productCards||'<p>Belum ada produk aktif.</p>')+'</div></section><aside class="panel pos-cart-panel" id="posCartPanel"><div class="panel-heading"><div><h2>Pesanan</h2><p id="cartCount">0 item</p></div><div class="pos-cart-heading-actions"><button class="text-button" id="clearCart">Kosongkan</button><button class="pos-cart-close" id="closeCartSheet" aria-label="Tutup pesanan">×</button></div></div><div id="cartItems" class="cart-items"><div class="cart-empty">Pilih minuman untuk memulai pesanan</div></div><div class="cart-summary" id="cartSummary"></div><label class="payment-label">Metode pembayaran<select id="paymentMethod" class="pos-select"><option value="cash">Tunai</option><option value="qris">QRIS</option><option value="transfer">Transfer</option></select></label><label class="payment-label">Catatan (opsional)<textarea id="saleNotes" rows="2" placeholder="Catatan pesanan"></textarea></label><button class="primary-button checkout-button" id="checkoutButton" disabled>Simpan transaksi</button><p class="pos-footnote">Transaksi akan tersimpan ke database setelah tombol ditekan.</p></aside></div><div class="pos-cart-backdrop" id="posCartBackdrop"></div><div class="pos-mobile-cartbar" id="posMobileCartbar"><div class="pos-mobile-cart-info"><span class="pos-mobile-cart-count" id="mobileCartCount">0</span><span><b>Pesanan</b><small id="mobileCartTotal">Belum ada item</small></span></div><button type="button" id="openCartSheet">Lihat pesanan <span>→</span></button></div>';
+ if(window.matchMedia("(max-width: 760px)").matches){
+  document.body.append(document.querySelector("#posCartPanel"),document.querySelector("#posCartBackdrop"),document.querySelector("#posMobileCartbar"));
+ }
  document.querySelector("#posChannel").addEventListener("change",e=>{posState.channel=posState.channels.find(c=>c.id===e.target.value);posState.cart=[];renderPOS();});
  document.querySelectorAll("[data-add-cart]").forEach(btn=>btn.addEventListener("click",()=>addToCart(btn.dataset.addCart)));
  document.querySelector("#clearCart").addEventListener("click",()=>{posState.cart=[];renderPOS();});
@@ -216,6 +220,12 @@ function renderCart(){
  if(mobileTotal)mobileTotal.textContent=posState.cart.length?money(subtotal):"Belum ada item";
  const mobileBar=document.querySelector("#posMobileCartbar");
  if(mobileBar)mobileBar.classList.toggle("has-items",count>0);
+}
+function cleanupPOSOverlays(){
+ ["posCartPanel","posCartBackdrop","posMobileCartbar"].forEach(id=>{
+  const node=document.getElementById(id);
+  if(node&&node.parentElement===document.body)node.remove();
+ });
 }
 function toggleCartSheet(open){
  const panel=document.querySelector("#posCartPanel"),backdrop=document.querySelector("#posCartBackdrop");
@@ -488,7 +498,7 @@ function openRecipeEditor(product,ingredients,activeRecipe,currentLines){
  };
 }
 
-function navigate(view){try{sessionStorage.setItem("drinkflow:lastView",view);}catch(error){}document.querySelector("#breadcrumbTitle").textContent=labels[view]||"Overview";document.querySelectorAll(".nav-link[data-view]").forEach(button=>button.classList.toggle("active",button.dataset.view===view));document.querySelector("#sidebar").classList.remove("open");if(view==="products"){loadProducts();return;}if(view==="pos"){loadPOS();return;}if(view==="orders"){loadOrders();return;}if(view==="purchasing"){loadPurchasing();return;}if(view==="inventory"){loadInventory();return;}if(view==="costRecipe"){loadCostRecipe();return;}if(view==="overview"){loadOverview();return;}if(view==="reports"){loadReports();return;}if(view!=="overview"){notify((labels[view]||view)+" module sedang disiapkan.");return;}}
+function navigate(view){if(view!=="pos")cleanupPOSOverlays();try{sessionStorage.setItem("drinkflow:lastView",view);}catch(error){}document.querySelector("#breadcrumbTitle").textContent=labels[view]||"Overview";document.querySelectorAll(".nav-link[data-view]").forEach(button=>button.classList.toggle("active",button.dataset.view===view));document.querySelector("#sidebar").classList.remove("open");if(view==="products"){loadProducts();return;}if(view==="pos"){loadPOS();return;}if(view==="orders"){loadOrders();return;}if(view==="purchasing"){loadPurchasing();return;}if(view==="inventory"){loadInventory();return;}if(view==="costRecipe"){loadCostRecipe();return;}if(view==="overview"){loadOverview();return;}if(view==="reports"){loadReports();return;}if(view!=="overview"){notify((labels[view]||view)+" module sedang disiapkan.");return;}}
 document.querySelectorAll("[data-view]").forEach(button=>button.addEventListener("click",()=>navigate(button.dataset.view)));
 document.querySelector("#mobileMenu").addEventListener("click",()=>document.querySelector("#sidebar").classList.toggle("open"));
 if(initSupabase()){
