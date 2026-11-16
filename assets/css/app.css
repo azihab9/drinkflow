@@ -246,3 +246,30 @@ footer{color:#8b978e}
 .ingredient-stock-note span{color:#718075}
 .ingredient-stock-note p{margin:4px 0 0;color:#78877c;font-size:11px;line-height:1.6}
 @media(max-width:600px){.inventory-actions{width:100%}.inventory-actions button{flex:1}.ingredient-editor{padding:20px;max-height:calc(100vh - 20px)}.ingredient-form-grid{grid-template-columns:1fr}}
+
+
+/* DrinkFlow premium light refresh */
+:root{--bg:#f4f7f2;--surface:#fff;--line:#e5ece3;--text:#1c3023;--muted:#7c8b7e;--green:#a9d1ad;--green-strong:#568e62;--green-soft:#e8f3e8;--shadow:0 12px 34px rgba(31,65,39,.065)}
+body{background:linear-gradient(135deg,#f7f9f5,#f1f6ef 55%,#f8f7f1);color:var(--text)}
+.sidebar{background:rgba(255,255,255,.94);backdrop-filter:blur(18px);border-right-color:#e7eee5;padding:27px 16px 17px}
+.brand{padding-bottom:38px;gap:12px}.brand-mark{width:41px;height:41px;border-radius:14px;background:linear-gradient(145deg,#c6e5c8,#83b88c);box-shadow:0 6px 15px rgba(91,146,101,.18)}
+.nav-list{gap:6px}.nav-link{min-height:43px;border-radius:11px;padding:11px 13px;color:#68796c;font-weight:550}.nav-link:hover{background:#f3f7f2;transform:translateX(2px)}.nav-link.active{background:linear-gradient(100deg,#e7f3e7,#f0f7ef);color:#315f3a;box-shadow:inset 3px 0 #75aa7e;font-weight:750}
+.store-status{padding:13px 11px;border-radius:12px;background:linear-gradient(120deg,#f0f7ef,#f8faf6);border-color:#e5eee3}
+.topbar{height:72px;padding:0 clamp(18px,3vw,42px);background:rgba(255,255,255,.86);backdrop-filter:blur(18px);border-bottom-color:#e4ece2}
+.date-chip{padding:8px 12px;border:1px solid #e8eee6;border-radius:9px;background:#fbfdfb}.logout-button{border-color:#e5ece3;border-radius:9px;padding:9px 13px}
+.page-content{padding:clamp(25px,3.2vw,44px) clamp(18px,3.2vw,44px) 28px;max-width:1600px}
+.welcome-row{margin-bottom:30px;align-items:center}.welcome-row .eyebrow{display:inline-flex;padding:7px 10px;border:1px solid #e2ece1;background:#f8fbf7;border-radius:7px;font-size:9px}.welcome-row h1{font-size:clamp(29px,3.2vw,39px);letter-spacing:-1.5px;margin:13px 0 7px}.welcome-row h1 em{color:#579665}
+.primary-button{border-radius:10px;background:linear-gradient(135deg,#b9dfbb,#93c49a);color:#1e4328;padding:12px 17px;box-shadow:0 7px 18px rgba(83,145,94,.16)}.primary-button:hover{background:linear-gradient(135deg,#c5e8c7,#a1d0a7);transform:translateY(-1px)}
+.metric-grid{gap:15px;margin-bottom:17px}.metric-card,.panel{border:1px solid #e6ede4;border-radius:16px;box-shadow:0 5px 20px rgba(39,70,43,.035);transition:box-shadow .2s,border-color .2s}
+.metric-card{position:relative;overflow:hidden;padding:20px 21px;min-height:140px;background:linear-gradient(145deg,#fff,#fcfefb)}.metric-card:after{content:"";position:absolute;width:95px;height:95px;border-radius:50%;right:-42px;bottom:-48px;background:rgba(165,207,169,.11)}.metric-card:hover,.panel:hover{box-shadow:0 12px 28px rgba(39,70,43,.065);border-color:#dce9da}
+.metric-top{font-size:12px;font-weight:600;color:#718174}.metric-icon{width:34px;height:34px;border-radius:11px}.metric-card>strong{font-size:28px;letter-spacing:-1.1px;color:#233b29;margin:15px 0 4px}
+.content-grid,.bottom-grid{gap:17px;margin-bottom:17px}.panel{padding:22px;background:rgba(255,255,255,.97);border-radius:16px}.panel-heading{margin-bottom:20px}.panel-heading h2{font-size:16px;letter-spacing:-.25px;color:#263b2b}.panel-heading p{font-size:12px;color:#89968b}
+.chart-empty{height:225px;border-radius:13px}.channel-row{padding:12px 1px}.channel-badge{width:32px;height:32px;border-radius:10px}
+.product-list{gap:9px}.product-item{padding:12px 13px;border-radius:10px;background:#fcfefb;font-size:11px}.product-item:hover{border-color:#cfe2cf;background:#f6fbf5}
+.getting-started{background:radial-gradient(circle at 95% 0%,rgba(179,216,178,.35),transparent 38%),linear-gradient(135deg,#eef7ed,#fbf8f0);border-color:#e1ebdf}.getting-started h2{font-size:19px;letter-spacing:-.45px}.setup-progress{height:6px;border-radius:20px}
+.table-wrap{border:1px solid #e8eee7;border-radius:12px;background:#fff}.data-table{border-collapse:separate;border-spacing:0}.data-table th{background:#f8faf7;color:#78897b;font-size:10px;letter-spacing:.65px;text-transform:uppercase;padding:14px}.data-table td{padding:14px;color:#405345;font-size:12px;border-bottom:1px solid #eff3ee}.data-table tbody tr:hover{background:#fbfdfb}
+.editor-backdrop{background:rgba(24,43,29,.34);backdrop-filter:blur(5px)}.product-editor,.purchase-editor,.recipe-editor,.ingredient-editor{border-radius:20px;box-shadow:0 30px 100px rgba(27,53,32,.22)}
+.pos-product{border-radius:13px;background:linear-gradient(145deg,#fff,#f9fcf8);padding:15px;border-color:#e5ede3}.pos-product:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 18px rgba(49,93,57,.08)}
+.order-card,.purchase-card,.order-summary-card{border-radius:15px;box-shadow:0 5px 20px rgba(39,70,43,.035)}.order-card:hover,.purchase-card:hover{border-color:#d8e7d6}
+.auth-card{border-radius:24px;box-shadow:0 28px 90px rgba(39,73,45,.11)}
+@media(max-width:760px){.sidebar{box-shadow:18px 0 55px rgba(31,55,35,.13)}.topbar{height:62px;padding:0 15px}.page-content{padding:23px 15px 22px}.welcome-row{gap:16px;margin-bottom:21px}.welcome-row h1{font-size:29px}.metric-grid{gap:10px}.metric-card{padding:15px;min-height:120px;border-radius:13px}.metric-card>strong{font-size:23px;margin-top:12px}.panel{padding:17px;border-radius:14px}.content-grid,.bottom-grid{gap:12px;margin-bottom:12px}}
