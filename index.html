@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101713">
+  <meta name="description" content="DrinkFlow — Matchaboy Pasid Business Management">
+  <title>DrinkFlow | MATCHABOY PASID</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#" aria-label="DrinkFlow home">
+        <span class="brand-mark">d.</span>
+        <span><strong>drinkflow</strong><small>MATCHABOY PASID</small></span>
+      </a>
+      <div class="workspace-label">WORKSPACE</div>
+      <nav class="nav-list" aria-label="Main navigation">
+        <button class="nav-link active" data-view="overview"><span class="nav-icon">◫</span> Overview</button>
+        <button class="nav-link" data-view="pos"><span class="nav-icon">▦</span> Point of Sale</button>
+        <button class="nav-link" data-view="orders"><span class="nav-icon">↗</span> Orders</button>
+        <div class="nav-divider"></div>
+        <button class="nav-link" data-view="products"><span class="nav-icon">◇</span> Products</button>
+        <button class="nav-link" data-view="inventory"><span class="nav-icon">▤</span> Inventory</button>
+        <button class="nav-link" data-view="purchasing"><span class="nav-icon">＋</span> Purchasing</button>
+        <div class="nav-divider"></div>
+        <button class="nav-link" data-view="expenses"><span class="nav-icon">−</span> Expenses</button>
+        <button class="nav-link" data-view="finance"><span class="nav-icon">⌁</span> Finance</button>
+        <button class="nav-link" data-view="reports"><span class="nav-icon">▥</span> Reports</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="store-status"><span class="status-dot"></span><span><b>Store workspace</b><small>Ready to configure</small></span></div>
+        <button class="nav-link" data-view="settings"><span class="nav-icon">⚙</span> Settings</button>
+        <div class="user-mini"><span class="avatar">M</span><span><b>Business Owner</b><small>Owner account</small></span><span class="more">•••</span></div>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobileMenu" aria-label="Open menu">☰</button>
+        <div class="breadcrumb"><span>Workspace</span><i>/</i><b id="breadcrumbTitle">Overview</b></div>
+        <div class="top-actions"><span class="date-chip" id="todayLabel"></span><span class="top-avatar">M</span></div>
+      </header>
+
+      <section class="page-content" id="pageContent">
+        <div class="welcome-row">
+          <div><div class="eyebrow">MONDAY, YOUR BUSINESS AT A GLANCE</div><h1>Good morning, <em>Matchaboy.</em></h1><p>Here’s what’s happening at your store today.</p></div>
+          <button class="primary-button" data-view="pos"><span>＋</span> New transaction</button>
+        </div>
+
+        <div class="metric-grid">
+          <article class="metric-card"><div class="metric-top"><span>Today's revenue</span><span class="metric-icon green">↗</span></div><strong>Rp0</strong><small class="muted">No sales recorded yet</small></article>
+          <article class="metric-card"><div class="metric-top"><span>Orders</span><span class="metric-icon blue">▦</span></div><strong>0</strong><small class="muted">Transactions today</small></article>
+          <article class="metric-card"><div class="metric-top"><span>Gross profit</span><span class="metric-icon amber">⌁</span></div><strong>—</strong><small class="muted">Waiting for recipe & HPP data</small></article>
+          <article class="metric-card"><div class="metric-top"><span>Active products</span><span class="metric-icon violet">◇</span></div><strong>11</strong><small class="positive">All products registered</small></article>
+        </div>
+
+        <div class="content-grid">
+          <article class="panel sales-panel">
+            <div class="panel-heading"><div><h2>Sales overview</h2><p>Revenue performance will appear here.</p></div><span class="select-label">This week⌄</span></div>
+            <div class="chart-empty"><div class="chart-symbol">⌁</div><b>Your sales story starts here</b><span>Complete the Supabase connection to show live business data.</span></div>
+          </article>
+          <article class="panel channel-panel">
+            <div class="panel-heading"><div><h2>Sales channels</h2><p>Overview by channel</p></div><span class="panel-menu">•••</span></div>
+            <div class="channel-row"><span class="channel-badge offline">OF</span><span><b>Offline</b><small>In-store sales</small></span><strong>—</strong></div>
+            <div class="channel-row"><span class="channel-badge whatsapp">WA</span><span><b>WhatsApp</b><small>Direct orders</small></span><strong>—</strong></div>
+            <div class="channel-row"><span class="channel-badge gofood">G</span><span><b>GoFood</b><small>Marketplace</small></span><strong>—</strong></div>
+            <div class="channel-row"><span class="channel-badge grab">Gr</span><span><b>GrabFood</b><small>Marketplace</small></span><strong>—</strong></div>
+            <div class="channel-row"><span class="channel-badge shopee">S</span><span><b>ShopeeFood</b><small>Marketplace</small></span><strong>—</strong></div>
+          </article>
+        </div>
+
+        <div class="bottom-grid">
+          <article class="panel"><div class="panel-heading"><div><h2>Popular products</h2><p>Your product catalog</p></div><button class="text-button" data-view="products">View all →</button></div><div id="popularProducts" class="product-list"></div></article>
+          <article class="panel getting-started"><div class="eyebrow">GETTING STARTED</div><h2>Make DrinkFlow yours.</h2><p>Connect your database, configure recipes, and start recording sales in one place.</p><div class="setup-progress"><span></span></div><small>1 of 4 setup steps completed</small><button class="secondary-button" data-view="settings">Continue setup →</button></article>
+        </div>
+        <footer>© <span id="year"></span> MATCHABOY PASID <span>·</span> Powered by DrinkFlow</footer>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
