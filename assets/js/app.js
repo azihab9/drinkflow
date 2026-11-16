@@ -50,7 +50,7 @@ document.querySelector("#loginForm").addEventListener("submit",async event=>{
 });
 document.querySelector("#logoutButton").addEventListener("click",async()=>{await supabaseClient.auth.signOut();appShell.hidden=true;authGate.hidden=false;});
 
-const labels={overview:"Overview",pos:"Point of Sale",orders:"Orders",products:"Products",inventory:"Inventory",purchasing:"Purchasing",expenses:"Expenses",finance:"Finance",reports:"Reports",settings:"Settings"};
+const labels={overview:"Overview",pos:"Point of Sale",orders:"Orders",products:"Products",inventory:"Inventory",purchasing:"Purchasing",expenses:"Expenses",finance:"Finance",reports:"Reports",costRecipe:"Cost & Recipe",settings:"Settings"};
 function notify(message){const toast=document.querySelector("#toast");toast.textContent=message;toast.classList.add("show");window.clearTimeout(notify.timer);notify.timer=window.setTimeout(()=>toast.classList.remove("show"),2800);}
 
 function dfDayOffset(offset){const p=Object.fromEntries(new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Jakarta",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()).map(x=>[x.type,x.value]));return new Date(Date.UTC(+p.year,+p.month-1,+p.day+offset)).toISOString().slice(0,10);}
@@ -346,7 +346,31 @@ async function loadInventory(){
  page.querySelector('[data-view="purchasing"]').onclick=()=>navigate("purchasing");
 }
 
-function navigate(view){document.querySelector("#breadcrumbTitle").textContent=labels[view]||"Overview";document.querySelectorAll(".nav-link[data-view]").forEach(button=>button.classList.toggle("active",button.dataset.view===view));document.querySelector("#sidebar").classList.remove("open");if(view==="products"){loadProducts();return;}if(view==="pos"){loadPOS();return;}if(view==="orders"){loadOrders();return;}if(view==="purchasing"){loadPurchasing();return;}if(view==="inventory"){loadInventory();return;}if(view==="overview"){loadOverview();return;}if(view==="reports"){loadReports();return;}if(view!=="overview"){notify((labels[view]||view)+" module sedang disiapkan.");return;}}
+
+async function loadCostRecipe(){
+ const page=document.querySelector("#pageContent");
+ if(currentRole!=="owner"){page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID</div><h1>Cost & Recipe</h1><p>Pengelolaan HPP dan resep hanya tersedia untuk Owner.</p></div></div><div class="panel"><h2>Akses Owner diperlukan</h2><p>Kasir tidak dapat mengubah HPP atau resep.</p></div>';return;}
+ page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID · COST CONTROL</div><h1>Cost & Recipe</h1><p>Pantau HPP per produk berdasarkan average cost bahan baku.</p></div><button class="secondary-button" id="refreshCostRecipe">↻ Refresh</button></div><div class="panel">Menghitung HPP produk...</div>';
+ const {data:products,error}=await supabaseClient.from("products").select("id,sku,name,is_active").eq("is_active",true).order("name");
+ if(error){page.innerHTML='<div class="panel"><h2>Gagal memuat produk</h2><p>'+escapeHtml(error.message)+'</p><button class="secondary-button" id="retryCostRecipe">Coba lagi</button></div>';document.querySelector("#retryCostRecipe").onclick=loadCostRecipe;return;}
+ const results=await Promise.all((products||[]).map(async p=>{
+  const r=await supabaseClient.rpc("calculate_product_hpp",{p_product_sku:p.sku});
+  if(r.error)return {product:p,error:r.error.message};
+  const d=Array.isArray(r.data)?r.data[0]:r.data;
+  return {product:p,data:d||null};
+ }));
+ const ready=results.filter(x=>x.data&&x.data.hpp!==null&&!x.data.ingredients_with_missing_cost).length;
+ const missing=results.length-ready;
+ const total=results.reduce((n,x)=>n+(Number(x.data?.hpp)||0),0);
+ const rows=results.map(x=>{
+  const d=x.data,problem=x.error||(!d?"Resep belum tersedia":Number(d.ingredients_with_missing_cost)>0?"Ada bahan tanpa biaya":d.hpp===null?"HPP belum dapat dihitung":"");
+  return '<tr><td><strong>'+escapeHtml(x.product.name)+'</strong><small class="table-sub">'+escapeHtml(x.product.sku)+'</small></td><td>'+(d?escapeHtml(d.recipe_name||"—"):"—")+'</td><td>'+(d&&d.hpp!==null?'<strong>'+money(d.hpp)+'</strong>':'—')+'</td><td><span class="product-status '+(problem?'inactive':'')+'">'+(problem?escapeHtml(problem):'Siap')+'</span></td></tr>';
+ }).join("");
+ page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID · COST CONTROL</div><h1>Cost & Recipe</h1><p>HPP dihitung otomatis dari average cost bahan baku dan takaran resep.</p></div><button class="secondary-button" id="refreshCostRecipe">↻ Refresh</button></div><div class="metric-grid"><article class="metric-card"><div class="metric-top"><span>Produk aktif</span></div><strong>'+results.length+'</strong><small class="muted">Menu terdaftar</small></article><article class="metric-card"><div class="metric-top"><span>HPP siap</span></div><strong>'+ready+'</strong><small class="muted">Semua bahan memiliki biaya</small></article><article class="metric-card"><div class="metric-top"><span>Perlu dilengkapi</span></div><strong>'+missing+'</strong><small class="muted">Resep atau biaya belum lengkap</small></article><article class="metric-card"><div class="metric-top"><span>Total HPP seluruh menu</span></div><strong>'+money(total)+'</strong><small class="muted">Jumlah HPP per satuan produk</small></article></div><div class="panel"><div class="panel-heading"><div><h2>HPP per produk</h2><p>Nilai dihitung ulang saat halaman dibuka atau di-refresh.</p></div></div><div class="table-wrap"><table class="data-table inventory-table"><thead><tr><th>Produk</th><th>Resep</th><th>HPP / unit</th><th>Status</th></tr></thead><tbody>'+(rows||'<tr><td colspan="4">Belum ada produk aktif.</td></tr>')+'</tbody></table></div></div><div class="panel cost-recipe-note"><h2>Pengelolaan resep</h2><p>Berikutnya kita aktifkan editor resep agar Owner bisa mengubah takaran bahan langsung dari aplikasi. Harga bahan tetap mengikuti pembelian dan average cost Inventory.</p></div>';
+ document.querySelector("#refreshCostRecipe").onclick=loadCostRecipe;
+}
+
+function navigate(view){document.querySelector("#breadcrumbTitle").textContent=labels[view]||"Overview";document.querySelectorAll(".nav-link[data-view]").forEach(button=>button.classList.toggle("active",button.dataset.view===view));document.querySelector("#sidebar").classList.remove("open");if(view==="products"){loadProducts();return;}if(view==="pos"){loadPOS();return;}if(view==="orders"){loadOrders();return;}if(view==="purchasing"){loadPurchasing();return;}if(view==="inventory"){loadInventory();return;}if(view==="costRecipe"){loadCostRecipe();return;}if(view==="overview"){loadOverview();return;}if(view==="reports"){loadReports();return;}if(view!=="overview"){notify((labels[view]||view)+" module sedang disiapkan.");return;}}
 document.querySelectorAll("[data-view]").forEach(button=>button.addEventListener("click",()=>navigate(button.dataset.view)));
 document.querySelector("#mobileMenu").addEventListener("click",()=>document.querySelector("#sidebar").classList.toggle("open"));
 if(initSupabase()){
