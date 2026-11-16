@@ -1197,3 +1197,15 @@ input:focus,select:focus,textarea:focus,.pos-select:focus{outline:none;border-co
  .recipe-editor-backdrop{align-items:end!important;padding:10px!important;padding-bottom:calc(10px + env(safe-area-inset-bottom))!important}
  .recipe-editor-backdrop .recipe-editor{width:100%!important;max-height:90vh!important;max-height:90dvh!important;border-radius:20px!important;padding:19px!important}
 }
+
+
+/* Opening stock entry modal */
+.opening-stock-backdrop{position:fixed!important;inset:0!important;z-index:10060!important;display:grid!important;place-items:center!important;padding:20px!important;overflow-y:auto!important;background:rgba(42,58,43,.38)!important;-webkit-backdrop-filter:blur(10px) saturate(125%)!important;backdrop-filter:blur(10px) saturate(125%)!important}
+.opening-stock-editor{position:relative!important;width:min(100%,680px)!important;max-height:min(88vh,900px)!important;max-height:min(88dvh,900px)!important;overflow-y:auto!important;overscroll-behavior:contain!important;background:rgba(255,255,255,.98)!important;border:1px solid rgba(255,255,255,.9)!important;box-shadow:0 28px 90px rgba(42,62,43,.24)!important}
+.opening-stock-editor .ingredient-form-grid{margin:18px 0}
+.opening-stock-editor .recipe-name-field{display:grid;gap:8px;margin:14px 0;font-weight:700;color:#526B54}
+.opening-stock-editor .recipe-name-field select,.opening-stock-editor .recipe-name-field textarea{width:100%;padding:12px;border:1px solid #DDE8DA;border-radius:11px;background:#fff;color:#344638}
+.opening-stock-editor .ingredient-form-grid label{display:grid;gap:7px;font-weight:700;color:#526B54}
+.opening-stock-editor .ingredient-form-grid input{width:100%;padding:12px;border:1px solid #DDE8DA;border-radius:11px;background:#fff}
+.opening-stock-editor small{font-weight:400;color:#849184;line-height:1.45}
+@media(max-width:650px){.inventory-actions{display:flex;flex-wrap:wrap;gap:8px}.opening-stock-backdrop{align-items:end!important;padding:10px!important;padding-bottom:calc(10px + env(safe-area-inset-bottom))!important}.opening-stock-editor{width:100%!important;max-height:90vh!important;max-height:90dvh!important;border-radius:20px!important;padding:19px!important}.opening-stock-editor .ingredient-form-grid{grid-template-columns:1fr!important}}
