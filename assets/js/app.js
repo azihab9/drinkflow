@@ -36,7 +36,14 @@ async function checkSession(){
   showApp(profile,session.user);
  }catch(error){appShell.hidden=true;authGate.hidden=false;authStatus("Gagal memeriksa sesi: "+(error.message||"Periksa koneksi internet."));}
 }
-document.querySelector("#loginForm").addEventListener("submit",async event=>{
+document.querySelectorAll("[data-auth-mode]").forEach(tab=>tab.addEventListener("click",()=>{
+ const mode=tab.dataset.authMode;
+ document.querySelectorAll("[data-auth-mode]").forEach(x=>x.classList.toggle("active",x===tab));
+ document.querySelector("#ownerLoginForm").hidden=mode!=="owner";
+ document.querySelector("#cashierLoginForm").hidden=mode!=="cashier";
+ authStatus("",false);
+}));
+document.querySelector("#ownerLoginForm").addEventListener("submit",async event=>{
  event.preventDefault();
  const submit=event.currentTarget.querySelector('button[type="submit"]');
  submit.disabled=true;submit.textContent="Memproses...";
@@ -48,10 +55,34 @@ document.querySelector("#loginForm").addEventListener("submit",async event=>{
   if(error)throw error;
   const {data:profile,error:profileError}=await supabaseClient.from("profiles").select("full_name,role,is_active").eq("id",data.user.id).single();
   if(profileError)throw profileError;
-  if(!profile||!profile.is_active){await supabaseClient.auth.signOut();throw new Error("Profil tidak aktif atau tidak ditemukan. Hubungi Owner.");}
+  if(!profile||!profile.is_active||profile.role!=="owner"){await supabaseClient.auth.signOut();throw new Error("Akun ini bukan Owner aktif.");}
   authStatus("",false);showApp(profile,data.user);
  }catch(error){authStatus("Login gagal: "+(error.message||"Terjadi kesalahan. Coba lagi."));}
- finally{submit.disabled=false;submit.textContent="Masuk";}
+ finally{submit.disabled=false;submit.textContent="Masuk sebagai Owner";}
+});
+document.querySelector("#cashierLoginForm").addEventListener("submit",async event=>{
+ event.preventDefault();
+ const submit=event.currentTarget.querySelector('button[type="submit"]');
+ submit.disabled=true;submit.textContent="Memverifikasi...";
+ authStatus("Memverifikasi ID Kasir dan PIN...",false);
+ try{
+  if(!supabaseClient)throw new Error("Koneksi Supabase belum siap. Muat ulang halaman.");
+  const cashier_code=document.querySelector("#cashierCode").value.trim().toUpperCase();
+  const pin=document.querySelector("#cashierPin").value;
+  const response=await fetch(SUPABASE_URL+"/functions/v1/cashier-auth",{
+   method:"POST",headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY},
+   body:JSON.stringify({action:"login",cashier_code,pin})
+  });
+  const result=await response.json();
+  if(!response.ok)throw new Error(result.error||"Login kasir gagal.");
+  const {error:sessionError}=await supabaseClient.auth.setSession({access_token:result.session.access_token,refresh_token:result.session.refresh_token});
+  if(sessionError)throw sessionError;
+  const {data:profile,error:profileError}=await supabaseClient.from("profiles").select("full_name,role,is_active").eq("id",result.user.id).single();
+  if(profileError||!profile||!profile.is_active||profile.role!=="cashier"){await supabaseClient.auth.signOut();throw new Error("Akun kasir tidak aktif. Hubungi Owner.");}
+  document.querySelector("#cashierPin").value="";
+  authStatus("",false);showApp(profile,result.user);
+ }catch(error){authStatus("Login kasir gagal: "+(error.message||"Periksa ID dan PIN."));}
+ finally{submit.disabled=false;submit.textContent="Masuk sebagai Kasir";}
 });
 document.querySelector("#logoutButton").addEventListener("click",async()=>{try{sessionStorage.removeItem("drinkflow:lastView");}catch(error){}await supabaseClient.auth.signOut();appShell.hidden=true;authGate.hidden=false;});
 
