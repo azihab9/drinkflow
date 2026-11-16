@@ -183,11 +183,14 @@ function renderPOS(){
   const unavailable=price===null;
   return '<button class="pos-product '+(unavailable?'unavailable':'')+'" data-add-cart="'+p.id+'" '+(unavailable?'disabled':'')+'><span class="pos-product-name">'+escapeHtml(p.name)+'</span><small>'+escapeHtml(p.sku)+'</small><strong>'+(unavailable?'Harga belum diatur':money(price))+'</strong></button>';
  }).join("");
- page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID · CASHIER</div><h1>Point of Sale</h1><p>Pilih channel, tambahkan menu, lalu catat transaksi.</p></div></div><div class="pos-layout"><section class="panel pos-menu-panel"><div class="pos-toolbar"><div><h2>Pilih channel penjualan</h2><p>Harga mengikuti channel yang dipilih.</p></div><select id="posChannel" class="pos-select">'+channelOptions+'</select></div><div class="pos-products-grid">'+(productCards||'<p>Belum ada produk aktif.</p>')+'</div></section><aside class="panel pos-cart-panel"><div class="panel-heading"><div><h2>Pesanan</h2><p id="cartCount">0 item</p></div><button class="text-button" id="clearCart">Kosongkan</button></div><div id="cartItems" class="cart-items"><div class="cart-empty">Pilih minuman untuk memulai pesanan</div></div><div class="cart-summary" id="cartSummary"></div><label class="payment-label">Metode pembayaran<select id="paymentMethod" class="pos-select"><option value="cash">Tunai</option><option value="qris">QRIS</option><option value="transfer">Transfer</option></select></label><label class="payment-label">Catatan (opsional)<textarea id="saleNotes" rows="2" placeholder="Catatan pesanan"></textarea></label><button class="primary-button checkout-button" id="checkoutButton" disabled>Simpan transaksi</button><p class="pos-footnote">Transaksi akan tersimpan ke database setelah tombol ditekan.</p></aside></div>';
+ page.innerHTML='<div class="welcome-row pos-welcome"><div><div class="eyebrow">MATCHABOY PASID · CASHIER</div><h1>Point of Sale</h1><p>Pilih channel, tambahkan menu, lalu catat transaksi.</p></div></div><div class="pos-layout"><section class="panel pos-menu-panel"><div class="pos-toolbar"><div><h2>Pilih channel penjualan</h2><p>Harga mengikuti channel yang dipilih.</p></div><select id="posChannel" class="pos-select">'+channelOptions+'</select></div><div class="pos-products-grid">'+(productCards||'<p>Belum ada produk aktif.</p>')+'</div></section><aside class="panel pos-cart-panel" id="posCartPanel"><div class="panel-heading"><div><h2>Pesanan</h2><p id="cartCount">0 item</p></div><div class="pos-cart-heading-actions"><button class="text-button" id="clearCart">Kosongkan</button><button class="pos-cart-close" id="closeCartSheet" aria-label="Tutup pesanan">×</button></div></div><div id="cartItems" class="cart-items"><div class="cart-empty">Pilih minuman untuk memulai pesanan</div></div><div class="cart-summary" id="cartSummary"></div><label class="payment-label">Metode pembayaran<select id="paymentMethod" class="pos-select"><option value="cash">Tunai</option><option value="qris">QRIS</option><option value="transfer">Transfer</option></select></label><label class="payment-label">Catatan (opsional)<textarea id="saleNotes" rows="2" placeholder="Catatan pesanan"></textarea></label><button class="primary-button checkout-button" id="checkoutButton" disabled>Simpan transaksi</button><p class="pos-footnote">Transaksi akan tersimpan ke database setelah tombol ditekan.</p></aside></div><div class="pos-cart-backdrop" id="posCartBackdrop"></div><div class="pos-mobile-cartbar" id="posMobileCartbar"><div class="pos-mobile-cart-info"><span class="pos-mobile-cart-count" id="mobileCartCount">0</span><span><b>Pesanan</b><small id="mobileCartTotal">Belum ada item</small></span></div><button type="button" id="openCartSheet">Lihat pesanan <span>→</span></button></div>';
  document.querySelector("#posChannel").addEventListener("change",e=>{posState.channel=posState.channels.find(c=>c.id===e.target.value);posState.cart=[];renderPOS();});
  document.querySelectorAll("[data-add-cart]").forEach(btn=>btn.addEventListener("click",()=>addToCart(btn.dataset.addCart)));
  document.querySelector("#clearCart").addEventListener("click",()=>{posState.cart=[];renderPOS();});
  document.querySelector("#checkoutButton").addEventListener("click",submitSale);
+ document.querySelector("#openCartSheet").addEventListener("click",()=>toggleCartSheet(true));
+ document.querySelector("#closeCartSheet").addEventListener("click",()=>toggleCartSheet(false));
+ document.querySelector("#posCartBackdrop").addEventListener("click",()=>toggleCartSheet(false));
  renderCart();
 }
 function addToCart(id){
@@ -208,6 +211,18 @@ function renderCart(){
  host.querySelectorAll("[data-qty-plus]").forEach(b=>b.addEventListener("click",()=>changeQty(b.dataset.qtyPlus,1)));
  document.querySelector("#cartSummary").innerHTML='<div><span>Subtotal</span><b>'+money(subtotal)+'</b></div><div><span>Komisi '+rate+'%</span><b>'+money(fee)+'</b></div><div class="cart-net"><span>Estimasi diterima</span><b>'+money(net)+'</b></div>';
  document.querySelector("#checkoutButton").disabled=!posState.cart.length;
+ const mobileCount=document.querySelector("#mobileCartCount"),mobileTotal=document.querySelector("#mobileCartTotal");
+ if(mobileCount)mobileCount.textContent=String(count);
+ if(mobileTotal)mobileTotal.textContent=posState.cart.length?money(subtotal):"Belum ada item";
+ const mobileBar=document.querySelector("#posMobileCartbar");
+ if(mobileBar)mobileBar.classList.toggle("has-items",count>0);
+}
+function toggleCartSheet(open){
+ const panel=document.querySelector("#posCartPanel"),backdrop=document.querySelector("#posCartBackdrop");
+ if(!panel||!backdrop)return;
+ panel.classList.toggle("is-open",open);
+ backdrop.classList.toggle("is-visible",open);
+ document.body.classList.toggle("pos-sheet-open",open);
 }
 function changeQty(id,delta){const item=posState.cart.find(x=>x.product.id===id);if(!item)return;item.quantity+=delta;if(item.quantity<=0)posState.cart=posState.cart.filter(x=>x.product.id!==id);renderCart();}
 async function submitSale(){
