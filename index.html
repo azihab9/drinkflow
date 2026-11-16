@@ -12,7 +12,8 @@
   <link rel="stylesheet" href="assets/css/app.css?v=drinkflow-light-2">
 </head>
 <body>
-  <div class="app-shell">
+  <section id="authGate" class="auth-gate" aria-label="Login DrinkFlow"><div class="auth-card"><div class="auth-brand"><span class="brand-mark">d.</span><div><strong>drinkflow</strong><small>MATCHABOY PASID</small></div></div><div class="eyebrow">WELCOME BACK</div><h1>Masuk ke DrinkFlow</h1><p class="auth-copy">Kelola operasional MATCHABOY PASID dalam satu workspace.</p><form id="loginForm"><label for="loginEmail">Email</label><input id="loginEmail" type="email" autocomplete="username" placeholder="Email akun kamu" required><label for="loginPassword">Password</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Password" required><button class="primary-button auth-submit" type="submit">Masuk</button><p id="authMessage" class="auth-message" role="status"></p></form></div><div class="auth-art"><span class="auth-orb"></span><span class="auth-cup"></span><span class="auth-leaf">✳</span></div></section>
+  <div class="app-shell" id="appShell" hidden>
     <aside class="sidebar" id="sidebar">
       <a class="brand" href="#" aria-label="DrinkFlow home">
         <span class="brand-mark">d.</span>
@@ -43,7 +44,7 @@
       <header class="topbar">
         <button class="mobile-menu" id="mobileMenu" aria-label="Open menu">☰</button>
         <div class="breadcrumb"><span>Workspace</span><i>/</i><b id="breadcrumbTitle">Overview</b></div>
-        <div class="top-actions"><span class="date-chip" id="todayLabel"></span><span class="top-avatar">M</span></div>
+        <div class="top-actions"><span class="date-chip" id="todayLabel"></span><span class="top-avatar" id="topAvatar">M</span><button class="logout-button" id="logoutButton">Keluar</button></div>
       </header>
 
       <section class="page-content" id="pageContent">
@@ -83,6 +84,7 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="assets/js/app.js?v=products-live-1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/app.js?v=auth-login-1"></script>
 </body>
 </html>
