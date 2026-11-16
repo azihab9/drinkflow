@@ -1,0 +1,2 @@
+[functions.cashier-auth]
+verify_jwt = false
