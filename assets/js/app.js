@@ -19,7 +19,12 @@ function showApp(profile,user){
  document.querySelector(".user-mini b").textContent=display;
  document.querySelector(".user-mini small").textContent=profile?.role==="owner"?"Owner account":"Cashier account";
  document.querySelector("#topAvatar").textContent=display.slice(0,1).toUpperCase();
- loadOverview();
+ let savedView="overview";
+ try{
+  const candidate=sessionStorage.getItem("drinkflow:lastView");
+  if(candidate&&Object.prototype.hasOwnProperty.call(labels,candidate))savedView=candidate;
+ }catch(error){}
+ navigate(savedView);
 }
 async function checkSession(){
  try{
