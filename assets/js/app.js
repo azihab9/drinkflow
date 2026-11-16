@@ -477,14 +477,20 @@ function openRecipeEditor(product,ingredients,activeRecipe,currentLines){
    row.querySelector(".remove-recipe-line").onclick=()=>{if(items.length>1){items.splice(index,1);renderRows();}};
   });
  };
- const close=()=>{host.innerHTML="";};
- document.querySelector("#closeRecipeEditor").onclick=close;
- document.querySelector("#cancelRecipeEditor").onclick=close;
- document.querySelector("#addRecipeIngredient").onclick=()=>{items.push({ingredient_id:"",quantity:"",unit:""});renderRows();};
+ const close=()=>{
+  editorOverlay.remove();
+  host.replaceChildren();
+  document.body.classList.remove("recipe-editor-open");
+ };
+ document.body.classList.add("recipe-editor-open");
+ editorOverlay.querySelector("#closeRecipeEditor").addEventListener("click",event=>{event.preventDefault();event.stopPropagation();close();});
+ editorOverlay.querySelector("#cancelRecipeEditor").addEventListener("click",event=>{event.preventDefault();event.stopPropagation();close();});
+ editorOverlay.querySelector("#addRecipeIngredient").addEventListener("click",event=>{event.preventDefault();items.push({ingredient_id:"",quantity:"",unit:""});renderRows();});
+ editorOverlay.addEventListener("click",event=>{if(event.target===editorOverlay)close();});
  renderRows();
- document.querySelector("#recipeEditorForm").onsubmit=async event=>{
+ editorOverlay.querySelector("#recipeEditorForm").onsubmit=async event=>{
   event.preventDefault();
-  const button=document.querySelector("#saveRecipeButton"),message=document.querySelector("#recipeEditorMessage");
+  const button=editorOverlay.querySelector("#saveRecipeButton"),message=editorOverlay.querySelector("#recipeEditorMessage");
   const payload=items.map(x=>({ingredient_id:x.ingredient_id,quantity:Number(x.quantity),unit:x.unit}));
   if(payload.some(x=>!x.ingredient_id||!Number.isFinite(x.quantity)||x.quantity<=0||!x.unit)){message.textContent="Pilih bahan dan isi takaran yang valid pada setiap baris.";return;}
   if(new Set(payload.map(x=>x.ingredient_id)).size!==payload.length){message.textContent="Bahan yang sama hanya boleh dimasukkan satu kali.";return;}
