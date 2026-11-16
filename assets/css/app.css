@@ -715,3 +715,46 @@ body,.main-area,.page-content{background:#fff!important;color:var(--df-ink)!impo
 .secondary-button:hover{background:#E2EBE3!important}
 .date-chip{background:#fff!important;border-color:#E5EBE5!important;color:#68766D!important}
 @media(max-width:760px){.sidebar{background:linear-gradient(180deg,#405B49,#4C6954)!important}}
+
+/* DrinkFlow pastel palette inspired by uploaded reference */
+:root{--df-lavender:#C5ADED;--df-pink:#F8ABEB;--df-blush:#FFC8DD;--df-sky:#BCE0FF;--df-blue:#A2D2FF;--df-ink:#34304A;--df-muted:#77738A;--df-line:#ECE8F2}
+body,.main-area,.page-content{background:#fff!important;color:var(--df-ink)!important}
+.sidebar{background:linear-gradient(180deg,#8172A8 0%,#74669C 100%)!important;color:#fff}
+.brand,.brand strong{color:#fff!important}.brand small,.sidebar .muted,.sidebar small{color:#F0EAF8!important}
+.brand-mark{background:var(--df-lavender)!important;color:#51436F!important}
+.nav-link{color:#F5F0FA!important}.nav-link:hover{background:rgba(255,255,255,.13)!important;color:#fff!important}
+.nav-link.active{background:#fff!important;color:#62527F!important;box-shadow:inset 3px 0 var(--df-pink)!important}
+.store-status{background:rgba(255,255,255,.10)!important;border-color:rgba(255,255,255,.18)!important}
+.topbar{background:#fff!important;border-bottom:1px solid var(--df-line)!important}
+.welcome-row h1,.panel-heading h2{color:#51436F!important}
+.welcome-row .eyebrow{background:#F3EEFA!important;border-color:#E7DFF3!important;color:#74639A!important}
+.primary-button{background:#8172A8!important;color:#fff!important;box-shadow:0 6px 16px rgba(129,114,168,.20)!important}
+.primary-button:hover{background:#6F6097!important}
+.metric-card,.metric-card:nth-child(1),.metric-card:nth-child(2),.metric-card:nth-child(3),.metric-card:nth-child(4){color:#51436F!important;border:1px solid rgba(91,76,125,.07)!important;box-shadow:0 8px 20px rgba(91,76,125,.09)!important}
+.metric-card:nth-child(1){background:linear-gradient(135deg,#C5ADED,#D5C4F1)!important}
+.metric-card:nth-child(2){background:linear-gradient(135deg,#F8ABEB,#F9C0E9)!important}
+.metric-card:nth-child(3){background:linear-gradient(135deg,#FFC8DD,#FAD7E5)!important}
+.metric-card:nth-child(4){background:linear-gradient(135deg,#BCE0FF,#A2D2FF)!important}
+.metric-card .metric-top,.metric-card>strong,.metric-card small,.metric-card .muted{color:#51436F!important}
+.metric-card:after{background:#fff!important;opacity:.22!important}
+.metric-icon,.metric-card .metric-icon{background:rgba(255,255,255,.45)!important;color:#62527F!important}
+.panel{background:#fff!important;border:1px solid var(--df-line)!important;box-shadow:0 4px 16px rgba(72,61,99,.035)!important}
+.data-table th{background:#F2EFF8!important;color:#62527F!important}
+.data-table tbody tr:nth-child(even){background:#FCFBFE!important}.data-table tbody tr:hover{background:#F7F3FC!important}
+.channel-badge,.channel-row:nth-child(n) .channel-badge{background:#F1ECF8!important;color:#6D5D91!important}
+.channel-row:nth-child(3n) .channel-badge{background:#FCEAF4!important;color:#A65F91!important}
+.channel-row:nth-child(4n) .channel-badge{background:#EAF4FD!important;color:#557DA4!important}
+.getting-started{background:linear-gradient(120deg,#F3EEFA,#FDF0F7)!important;border-color:#E9E1F2!important}
+.getting-started h2,.getting-started p,.getting-started small{color:#51436F!important}
+.setup-progress{background:#EEE8F5!important}.setup-progress span{background:#C5ADED!important}
+.product-item,.product-item:nth-child(n){background:#FAF8FD!important;border-color:#ECE6F4!important;color:#51436F!important}
+.product-item span:last-child,.text-button{color:#74639A!important}
+.pos-product,.pos-product:nth-child(n){background:#fff!important;border-color:#ECE6F4!important}
+.pos-product:nth-child(3n+2){background:#FFF8FC!important;border-color:#F6E2F0!important}
+.pos-product:nth-child(3n){background:#F6FAFF!important;border-color:#E1EFFB!important}
+.secondary-button{background:#F2EFF8!important;border-color:#E7DFF3!important;color:#62527F!important}
+.secondary-button:hover{background:#E9E2F4!important}
+.date-chip{background:#fff!important;border-color:var(--df-line)!important;color:var(--df-muted)!important}
+.metric-card:hover{transform:translateY(-4px);box-shadow:0 14px 26px rgba(91,76,125,.14)!important}
+.panel:hover{transform:translateY(-1px);box-shadow:0 9px 22px rgba(72,61,99,.07)!important}
+@media(max-width:760px){.sidebar{background:linear-gradient(180deg,#8172A8,#74669C)!important}}
