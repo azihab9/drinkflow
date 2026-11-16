@@ -96,9 +96,9 @@ Deno.serve(async (req) => {
       });
       if (createError || !created.user) throw new Error(createError?.message || "Gagal membuat akun kasir.");
       const pinHash = await bcrypt.hash(pin, 12);
-      const { error: profileError } = await admin.from("profiles").insert({
+      const { error: profileError } = await admin.from("profiles").upsert({
         id: created.user.id, full_name: fullName, role: "cashier", is_active: true,
-      });
+      }, { onConflict: "id" });
       if (profileError) {
         await admin.auth.admin.deleteUser(created.user.id);
         throw new Error("Gagal membuat profil: " + profileError.message);
