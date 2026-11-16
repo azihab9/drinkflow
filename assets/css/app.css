@@ -440,3 +440,57 @@ body{background:radial-gradient(ellipse at 5% 0%,rgba(115,190,137,.2),transparen
  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
 }
 @media(max-width:760px){.sidebar{background:linear-gradient(180deg,#123e2b,#1d6844);box-shadow:18px 0 55px rgba(12,54,31,.3)}.metric-card{border-radius:15px}}
+
+
+/* DrinkFlow strict three-color system: forest, emerald, mint */
+:root{
+ --df-forest:#164B32;
+ --df-emerald:#39945E;
+ --df-mint:#E8F3EB;
+ --bg:var(--df-mint);
+ --surface:#fff;
+ --text:var(--df-forest);
+ --green:var(--df-emerald);
+ --green-strong:var(--df-forest);
+ --green-soft:#D5E9DB;
+ --muted:#66806F;
+ --line:#D5E9DB;
+ --shadow:0 12px 34px rgba(22,75,50,.09);
+}
+body{background:var(--df-mint);color:var(--df-forest)}
+.sidebar{background:var(--df-forest);color:#fff}
+.brand,.brand strong{color:#fff}
+.brand small,.sidebar .muted,.sidebar small{color:var(--df-mint)}
+.brand-mark{background:var(--df-emerald);color:#fff;box-shadow:none}
+.nav-link{color:var(--df-mint);transition:background .25s ease,color .25s ease,transform .25s ease}
+.nav-link:hover{background:rgba(255,255,255,.12);color:#fff;transform:translateX(3px)}
+.nav-link.active{background:var(--df-emerald);color:#fff;box-shadow:none;font-weight:800}
+.store-status{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);color:#fff}
+.store-status *{color:inherit}
+.topbar{background:#fff;border-bottom:1px solid var(--line)}
+.welcome-row .eyebrow{background:var(--df-mint);border:1px solid var(--line);color:var(--df-forest)}
+.welcome-row h1{color:var(--df-forest)}
+.primary-button{background:var(--df-emerald);color:#fff;border:0;box-shadow:0 7px 18px rgba(22,75,50,.16);transition:transform .22s ease,box-shadow .22s ease,background .22s ease}
+.primary-button:hover{background:var(--df-forest);color:#fff;transform:translateY(-2px);box-shadow:0 10px 22px rgba(22,75,50,.2)}
+.metric-card,.metric-card:nth-child(n),.metric-card:nth-child(2),.metric-card:nth-child(3),.metric-card:nth-child(4){background:var(--df-emerald);color:#fff;border:0;box-shadow:0 10px 24px rgba(22,75,50,.12);transition:transform .28s ease,box-shadow .28s ease}
+.metric-card .metric-top,.metric-card>strong,.metric-card small,.metric-card .muted{color:#fff!important}
+.metric-card:after{background:#fff;opacity:.12}
+.metric-icon,.metric-card .metric-icon{background:rgba(255,255,255,.18)!important;color:#fff!important}
+.panel{background:#fff;border:1px solid var(--line);box-shadow:0 7px 22px rgba(22,75,50,.05);transition:transform .25s ease,box-shadow .25s ease}
+.panel-heading h2{color:var(--df-forest)}
+.channel-badge,.channel-row:nth-child(n) .channel-badge{background:var(--df-mint);color:var(--df-forest)}
+.getting-started{background:var(--df-mint);border:1px solid var(--line);color:var(--df-forest)}
+.getting-started h2,.getting-started p,.getting-started small{color:var(--df-forest)}
+.product-item,.product-item:nth-child(n){background:var(--df-mint);border:1px solid var(--line);color:var(--df-forest)}
+.product-item span:last-child{color:var(--df-emerald)}
+.pos-product,.pos-product:nth-child(n){background:#fff;border:1px solid var(--line);transition:transform .24s ease,box-shadow .24s ease,border-color .24s ease}
+.data-table th{background:var(--df-mint);color:var(--df-forest)}
+.data-table tbody tr:nth-child(even){background:#F7FAF7}
+.data-table tbody tr:hover{background:var(--df-mint)}
+.secondary-button{background:var(--df-mint);border:1px solid var(--line);color:var(--df-forest);transition:transform .2s ease,background .2s ease}
+.secondary-button:hover{background:#D5E9DB;border-color:var(--df-emerald);transform:translateY(-1px)}
+.date-chip{background:var(--df-mint);border-color:var(--line);color:var(--df-forest)}
+.metric-card:hover{transform:translateY(-5px);box-shadow:0 16px 30px rgba(22,75,50,.18)}
+.panel:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(22,75,50,.09)}
+.pos-product:hover:not(:disabled){transform:translateY(-4px);box-shadow:0 10px 22px rgba(22,75,50,.1);border-color:var(--df-emerald)}
+@media(max-width:760px){.sidebar{background:var(--df-forest)}}
