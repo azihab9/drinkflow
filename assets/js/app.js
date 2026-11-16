@@ -117,7 +117,68 @@ function openProductEditor(product,channels,priceMap){
  });
 }
 
-function navigate(view){document.querySelector("#breadcrumbTitle").textContent=labels[view]||"Overview";document.querySelectorAll(".nav-link[data-view]").forEach(button=>button.classList.toggle("active",button.dataset.view===view));document.querySelector("#sidebar").classList.remove("open");if(view==="products"){loadProducts();return;}if(view!=="overview"){notify((labels[view]||view)+" module sedang disiapkan.");return;}window.location.reload();}
+
+let posState={products:[],channels:[],prices:[],channel:null,cart:[]};
+async function loadPOS(){
+ const page=document.querySelector("#pageContent");
+ page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID</div><h1>Point of Sale</h1><p>Memuat menu dan harga channel...</p></div></div><div class="panel">Menyiapkan kasir...</div>';
+ const [{data:products,error:pe},{data:channels,error:ce},{data:prices,error:pr}]=await Promise.all([
+  supabaseClient.from("products").select("id,sku,name,unit,is_active").eq("is_active",true).order("name"),
+  supabaseClient.from("sales_channels").select("id,code,name,commission_rate,is_active").eq("is_active",true).order("name"),
+  supabaseClient.from("product_channel_prices").select("product_id,channel_id,price")
+ ]);
+ if(pe||ce||pr){page.innerHTML='<div class="panel"><h2>Kasir belum bisa dimuat</h2><p>'+escapeHtml(pe?.message||ce?.message||pr?.message)+'</p></div>';return;}
+ posState={products:products||[],channels:channels||[],prices:prices||[],channel:null,cart:[]};
+ posState.channel=posState.channels.find(c=>c.code==="offline")||posState.channels[0]||null;
+ renderPOS();
+}
+function posPrice(productId,channelId){const found=posState.prices.find(x=>x.product_id===productId&&x.channel_id===channelId);return found?Number(found.price):null;}
+function renderPOS(){
+ const page=document.querySelector("#pageContent");
+ const channelOptions=posState.channels.map(c=>'<option value="'+c.id+'" '+(posState.channel?.id===c.id?'selected':'')+'>'+escapeHtml(c.name)+' · Komisi '+Number(c.commission_rate||0)+'%</option>').join("");
+ const productCards=posState.products.map(p=>{
+  const price=posPrice(p.id,posState.channel?.id);
+  const unavailable=price===null;
+  return '<button class="pos-product '+(unavailable?'unavailable':'')+'" data-add-cart="'+p.id+'" '+(unavailable?'disabled':'')+'><span class="pos-product-name">'+escapeHtml(p.name)+'</span><small>'+escapeHtml(p.sku)+'</small><strong>'+(unavailable?'Harga belum diatur':money(price))+'</strong></button>';
+ }).join("");
+ page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID · CASHIER</div><h1>Point of Sale</h1><p>Pilih channel, tambahkan menu, lalu catat transaksi.</p></div></div><div class="pos-layout"><section class="panel pos-menu-panel"><div class="pos-toolbar"><div><h2>Pilih channel penjualan</h2><p>Harga mengikuti channel yang dipilih.</p></div><select id="posChannel" class="pos-select">'+channelOptions+'</select></div><div class="pos-products-grid">'+(productCards||'<p>Belum ada produk aktif.</p>')+'</div></section><aside class="panel pos-cart-panel"><div class="panel-heading"><div><h2>Pesanan</h2><p id="cartCount">0 item</p></div><button class="text-button" id="clearCart">Kosongkan</button></div><div id="cartItems" class="cart-items"><div class="cart-empty">Pilih minuman untuk memulai pesanan</div></div><div class="cart-summary" id="cartSummary"></div><label class="payment-label">Metode pembayaran<select id="paymentMethod" class="pos-select"><option value="cash">Tunai</option><option value="qris">QRIS</option><option value="transfer">Transfer</option></select></label><label class="payment-label">Catatan (opsional)<textarea id="saleNotes" rows="2" placeholder="Catatan pesanan"></textarea></label><button class="primary-button checkout-button" id="checkoutButton" disabled>Simpan transaksi</button><p class="pos-footnote">Transaksi akan tersimpan ke database setelah tombol ditekan.</p></aside></div>';
+ document.querySelector("#posChannel").addEventListener("change",e=>{posState.channel=posState.channels.find(c=>c.id===e.target.value);posState.cart=[];renderPOS();});
+ document.querySelectorAll("[data-add-cart]").forEach(btn=>btn.addEventListener("click",()=>addToCart(btn.dataset.addCart)));
+ document.querySelector("#clearCart").addEventListener("click",()=>{posState.cart=[];renderPOS();});
+ document.querySelector("#checkoutButton").addEventListener("click",submitSale);
+ renderCart();
+}
+function addToCart(id){
+ const product=posState.products.find(p=>p.id===id),price=posPrice(id,posState.channel.id);
+ if(!product||price===null){notify("Harga produk untuk channel ini belum diatur.");return;}
+ const item=posState.cart.find(x=>x.product.id===id);
+ if(item)item.quantity++;else posState.cart.push({product,price,quantity:1});
+ renderCart();
+}
+function renderCart(){
+ const host=document.querySelector("#cartItems");if(!host)return;
+ const count=posState.cart.reduce((n,x)=>n+x.quantity,0);
+ const subtotal=posState.cart.reduce((n,x)=>n+x.price*x.quantity,0);
+ const rate=Number(posState.channel?.commission_rate||0),fee=Math.round(subtotal*rate/100),net=subtotal-fee;
+ document.querySelector("#cartCount").textContent=count+" item";
+ host.innerHTML=posState.cart.length?posState.cart.map(x=>'<div class="cart-line"><div class="cart-line-main"><b>'+escapeHtml(x.product.name)+'</b><small>'+money(x.price)+' / cup</small></div><div class="qty-control"><button data-qty-minus="'+x.product.id+'">−</button><span>'+x.quantity+'</span><button data-qty-plus="'+x.product.id+'">+</button></div><strong>'+money(x.price*x.quantity)+'</strong></div>').join(""):'<div class="cart-empty">Pilih minuman untuk memulai pesanan</div>';
+ host.querySelectorAll("[data-qty-minus]").forEach(b=>b.addEventListener("click",()=>changeQty(b.dataset.qtyMinus,-1)));
+ host.querySelectorAll("[data-qty-plus]").forEach(b=>b.addEventListener("click",()=>changeQty(b.dataset.qtyPlus,1)));
+ document.querySelector("#cartSummary").innerHTML='<div><span>Subtotal</span><b>'+money(subtotal)+'</b></div><div><span>Komisi '+rate+'%</span><b>'+money(fee)+'</b></div><div class="cart-net"><span>Estimasi diterima</span><b>'+money(net)+'</b></div>';
+ document.querySelector("#checkoutButton").disabled=!posState.cart.length;
+}
+function changeQty(id,delta){const item=posState.cart.find(x=>x.product.id===id);if(!item)return;item.quantity+=delta;if(item.quantity<=0)posState.cart=posState.cart.filter(x=>x.product.id!==id);renderCart();}
+async function submitSale(){
+ if(!posState.cart.length)return;
+ const button=document.querySelector("#checkoutButton");button.disabled=true;button.textContent="Menyimpan...";
+ try{
+  const payload={p_channel_code:posState.channel.code,p_payment_method:document.querySelector("#paymentMethod").value,p_items:posState.cart.map(x=>({product_id:x.product.id,quantity:x.quantity})),p_notes:document.querySelector("#saleNotes").value.trim()||null};
+  const {data,error}=await supabaseClient.rpc("create_sale",payload);
+  if(error)throw error;
+  posState.cart=[];notify("Transaksi berhasil disimpan.");await loadPOS();
+ }catch(error){notify("Transaksi gagal: "+error.message);button.disabled=false;button.textContent="Simpan transaksi";}
+}
+function navigate(view){document.querySelector("#breadcrumbTitle").textContent=labels[view]||"Overview";document.querySelectorAll(".nav-link[data-view]").forEach(button=>button.classList.toggle("active",button.dataset.view===view));document.querySelector("#sidebar").classList.remove("open");if(view==="products"){loadProducts();return;}if(view==="pos"){loadPOS();return;}if(view!=="overview"){notify((labels[view]||view)+" module sedang disiapkan.");return;}window.location.reload();}
 document.querySelectorAll("[data-view]").forEach(button=>button.addEventListener("click",()=>navigate(button.dataset.view)));
 document.querySelector("#mobileMenu").addEventListener("click",()=>document.querySelector("#sidebar").classList.toggle("open"));
 if(initSupabase()){
