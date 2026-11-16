@@ -175,10 +175,54 @@ async function submitSale(){
   const payload={p_channel_code:posState.channel.code,p_payment_method:document.querySelector("#paymentMethod").value,p_items:posState.cart.map(x=>({product_id:x.product.id,quantity:x.quantity})),p_notes:document.querySelector("#saleNotes").value.trim()||null};
   const {data,error}=await supabaseClient.rpc("create_sale",payload);
   if(error)throw error;
-  posState.cart=[];notify("Transaksi berhasil disimpan.");await loadPOS();
+  posState.cart=[];notify("Pesanan tersimpan. Menunggu konfirmasi pembayaran.");await loadOrders();
  }catch(error){notify("Transaksi gagal: "+error.message);button.disabled=false;button.textContent="Simpan transaksi";}
 }
-function navigate(view){document.querySelector("#breadcrumbTitle").textContent=labels[view]||"Overview";document.querySelectorAll(".nav-link[data-view]").forEach(button=>button.classList.toggle("active",button.dataset.view===view));document.querySelector("#sidebar").classList.remove("open");if(view==="products"){loadProducts();return;}if(view==="pos"){loadPOS();return;}if(view!=="overview"){notify((labels[view]||view)+" module sedang disiapkan.");return;}window.location.reload();}
+
+async function loadOrders(){
+ const page=document.querySelector("#pageContent");
+ page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID</div><h1>Orders</h1><p>Daftar transaksi dan konfirmasi pembayaran.</p></div><button class="secondary-button" id="refreshOrders">↻ Refresh</button></div><div class="panel">Memuat transaksi...</div>';
+ const [orderResult,channelResult]=await Promise.all([
+  supabaseClient.from("orders").select("*").order("created_at",{ascending:false}).limit(100),
+  supabaseClient.from("sales_channels").select("id,name")
+ ]);
+ if(orderResult.error||channelResult.error){
+  page.innerHTML='<div class="panel"><h2>Gagal memuat transaksi</h2><p>'+escapeHtml(orderResult.error?.message||channelResult.error?.message)+'</p><button class="secondary-button" id="retryOrders">Coba lagi</button></div>';
+  document.querySelector("#retryOrders").addEventListener("click",loadOrders);return;
+ }
+ const orders=orderResult.data||[],channels=channelResult.data||[],ids=orders.map(o=>o.id);
+ let items=[];
+ if(ids.length){
+  const itemResult=await supabaseClient.from("order_items").select("order_id,product_name,quantity,subtotal").in("order_id",ids);
+  if(itemResult.error){page.innerHTML='<div class="panel"><h2>Gagal memuat detail pesanan</h2><p>'+escapeHtml(itemResult.error.message)+'</p></div>';return;}
+  items=itemResult.data||[];
+ }
+ const channelMap=new Map(channels.map(c=>[c.id,c.name])),itemMap=new Map();
+ items.forEach(i=>{if(!itemMap.has(i.order_id))itemMap.set(i.order_id,[]);itemMap.get(i.order_id).push(i);});
+ const pending=orders.filter(o=>o.order_status==="pending").length;
+ const rows=orders.map(o=>{
+  const lines=(itemMap.get(o.id)||[]).map(i=>'<div class="order-item-line"><span>'+escapeHtml(i.product_name)+' × '+Number(i.quantity)+'</span><b>'+money(i.subtotal)+'</b></div>').join("");
+  const labels={pending:"Menunggu pembayaran",processing:"Diproses",completed:"Selesai",cancelled:"Dibatalkan"};
+  const date=o.created_at?new Intl.DateTimeFormat("id-ID",{dateStyle:"medium",timeStyle:"short",timeZone:"Asia/Jakarta"}).format(new Date(o.created_at)):"—";
+  const payment={cash:"Tunai",qris:"QRIS",transfer:"Transfer"}[o.payment_method]||o.payment_method||"—";
+  return '<article class="order-card"><div class="order-card-top"><div><strong>'+escapeHtml(o.order_number)+'</strong><small>'+escapeHtml(channelMap.get(o.channel_id)||"Channel")+' · '+date+'</small></div><span class="order-status '+escapeHtml(o.order_status)+'">'+escapeHtml(labels[o.order_status]||o.order_status)+'</span></div><div class="order-items">'+(lines||"<small>Detail item tidak tersedia.</small>")+'</div><div class="order-totals"><span>Total <b>'+money(o.total_amount)+'</b></span><span>Komisi <b>'+money(o.platform_fee)+'</b></span><span>Estimasi diterima <b>'+money(o.net_amount)+'</b></span></div><div class="order-card-bottom"><small>Pembayaran: '+escapeHtml(payment)+'</small>'+(o.order_status==="pending"?'<button class="primary-button confirm-payment" data-confirm-order="'+o.id+'">Konfirmasi pembayaran</button>':'')+'</div>'+(o.notes?'<p class="order-notes">Catatan: '+escapeHtml(o.notes)+'</p>':'')+'</article>';
+ }).join("");
+ page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID</div><h1>Orders</h1><p>Kelola transaksi dan konfirmasi pembayaran.</p></div><button class="secondary-button" id="refreshOrders">↻ Refresh</button></div><div class="order-summary"><div class="order-summary-card"><small>Total transaksi terbaru</small><strong>'+orders.length+'</strong></div><div class="order-summary-card"><small>Menunggu konfirmasi</small><strong>'+pending+'</strong></div><div class="order-summary-card"><small>Selesai</small><strong>'+orders.filter(o=>o.order_status==="completed").length+'</strong></div></div><div class="orders-list">'+(rows||'<div class="panel order-empty">Belum ada transaksi. Buat pesanan pertama dari Point of Sale.</div>')+'</div>';
+ document.querySelector("#refreshOrders").addEventListener("click",loadOrders);
+ document.querySelectorAll("[data-confirm-order]").forEach(b=>b.addEventListener("click",()=>confirmPayment(b.dataset.confirmOrder,b)));
+}
+async function confirmPayment(orderId,button){
+ if(!window.confirm("Pastikan pembayaran sudah benar-benar diterima. Konfirmasi transaksi ini?"))return;
+ button.disabled=true;button.textContent="Mengonfirmasi...";
+ try{
+  const {data,error}=await supabaseClient.rpc("confirm_sale_payment",{p_order_id:orderId});
+  if(error)throw error;
+  if(!data?.success)throw new Error("Konfirmasi tidak berhasil.");
+  notify("Pembayaran berhasil dikonfirmasi.");await loadOrders();
+ }catch(error){notify("Gagal konfirmasi: "+error.message);button.disabled=false;button.textContent="Konfirmasi pembayaran";}
+}
+
+function navigate(view){document.querySelector("#breadcrumbTitle").textContent=labels[view]||"Overview";document.querySelectorAll(".nav-link[data-view]").forEach(button=>button.classList.toggle("active",button.dataset.view===view));document.querySelector("#sidebar").classList.remove("open");if(view==="products"){loadProducts();return;}if(view==="pos"){loadPOS();return;}if(view==="orders"){loadOrders();return;}if(view!=="overview"){notify((labels[view]||view)+" module sedang disiapkan.");return;}window.location.reload();}
 document.querySelectorAll("[data-view]").forEach(button=>button.addEventListener("click",()=>navigate(button.dataset.view)));
 document.querySelector("#mobileMenu").addEventListener("click",()=>document.querySelector("#sidebar").classList.toggle("open"));
 if(initSupabase()){
