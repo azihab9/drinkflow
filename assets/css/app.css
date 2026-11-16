@@ -232,3 +232,17 @@ footer{color:#8b978e}
  .recipe-lines-heading{align-items:flex-start;flex-direction:column}
  .recipe-lines-heading .secondary-button{width:100%}
 }
+
+
+/* Ingredient master creation */
+.inventory-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.ingredient-editor{width:min(100%,620px);max-height:calc(100vh - 36px);overflow:auto;background:#fff;border:1px solid #e1eae1;border-radius:18px;padding:26px;box-shadow:0 24px 90px rgba(25,50,30,.2);color:#203327}
+.ingredient-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ingredient-form-grid label{display:grid;gap:7px;color:#526357;font-size:12px;font-weight:700}
+.ingredient-form-grid input,.ingredient-form-grid select{width:100%;min-width:0;border:1px solid #dce7dc;border-radius:8px;padding:11px 12px;background:#fbfdfb;color:#203327;font:14px "DM Sans",sans-serif;outline:none}
+.ingredient-form-grid input:focus,.ingredient-form-grid select:focus{border-color:#8fbd98;box-shadow:0 0 0 3px #e8f3e9}
+.ingredient-form-grid small{font-size:10px;font-weight:400;color:#829086;line-height:1.4}
+.ingredient-stock-note{display:grid;gap:5px;margin-top:20px;padding:14px;border:1px solid #e3eee3;border-radius:10px;background:#f3f8f3;color:#45654b;font-size:12px}
+.ingredient-stock-note span{color:#718075}
+.ingredient-stock-note p{margin:4px 0 0;color:#78877c;font-size:11px;line-height:1.6}
+@media(max-width:600px){.inventory-actions{width:100%}.inventory-actions button{flex:1}.ingredient-editor{padding:20px;max-height:calc(100vh - 20px)}.ingredient-form-grid{grid-template-columns:1fr}}
