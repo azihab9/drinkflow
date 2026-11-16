@@ -670,12 +670,21 @@ async function loadPayroll(){
  if(currentRole!=="owner"){notify("Payroll hanya dapat diakses Owner.");navigate("overview");return;}
  const page=document.querySelector("#pageContent");
  page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID · HUMAN RESOURCES</div><h1>Payroll</h1><p>Gaji bulanan tetap, satu kali pembayaran setiap bulan.</p></div><button class="secondary-button" id="refreshPayroll">↻ Refresh</button></div><div class="panel">Memuat data payroll...</div>';
- const [employees,periods]=await Promise.all([
-  supabaseClient.from("employees").select("*").order("full_name"),
-  supabaseClient.from("payroll_periods").select("*").order("period_month",{ascending:false}).limit(18)
- ]);
- const err=employees.error||periods.error;
- if(err){page.innerHTML='<div class="panel"><h2>Gagal memuat Payroll</h2><p>'+escapeHtml(err.message)+'</p><p>Pastikan migration Expenses & Payroll sudah dijalankan di Supabase.</p></div>';return;}
+ let employees,periods;
+ try {
+  const queries=Promise.all([
+   supabaseClient.from("employees").select("*").order("full_name"),
+   supabaseClient.from("payroll_periods").select("*").order("period_month",{ascending:false}).limit(18)
+  ]);
+  const timeout=new Promise((_,reject)=>setTimeout(()=>reject(new Error("Permintaan ke Supabase tidak mendapat respons dalam 15 detik. Periksa koneksi, sesi login, dan status Supabase.")),15000));
+  [employees,periods]=await Promise.race([queries,timeout]);
+ } catch(error) {
+  page.innerHTML='<div class="panel"><h2>Payroll tidak berhasil dimuat</h2><p>'+escapeHtml(error?.message||String(error))+'</p><p>Coba tekan Refresh. Jika berulang, kirim screenshot pesan ini.</p><button class="secondary-button" id="retryPayrollError">Coba lagi</button></div>';
+  page.querySelector("#retryPayrollError").onclick=loadPayroll;
+  return;
+ }
+ const err=employees?.error||periods?.error;
+ if(err){page.innerHTML='<div class="panel"><h2>Gagal memuat Payroll</h2><p>'+escapeHtml(err.message)+'</p><p>Periksa tabel employees, payroll_periods, dan kebijakan RLS di Supabase.</p><button class="secondary-button" id="retryPayrollError">Coba lagi</button></div>';page.querySelector("#retryPayrollError").onclick=loadPayroll;return;}
  const emps=employees.data||[],runs=periods.data||[];
  const employeeRows=emps.map(x=>'<tr><td><strong>'+escapeHtml(x.full_name)+'</strong><small class="table-sub">'+escapeHtml(x.employee_code)+' · '+escapeHtml(x.position||"Karyawan")+'</small></td><td>'+money(x.base_salary)+'</td><td><span class="product-status '+(x.is_active?"":"inactive")+'">'+(x.is_active?"Aktif":"Nonaktif")+'</span></td></tr>').join("");
  const periodRows=runs.map(x=>'<tr><td><strong>'+new Intl.DateTimeFormat("id-ID",{month:"long",year:"numeric",timeZone:"Asia/Jakarta"}).format(new Date(x.period_month+"T12:00:00+07:00"))+'</strong></td><td>'+money(x.total_amount)+'</td><td><span class="purchase-status '+x.status+'">'+(x.status==="paid"?"Dibayar":"Draft")+'</span></td><td><button class="table-action" data-open-payroll="'+x.id+'">Lihat rincian →</button></td></tr>').join("");
