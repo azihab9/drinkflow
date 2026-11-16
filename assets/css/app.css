@@ -974,3 +974,50 @@ html,body,.app-shell,.main-area,.page-content{background:#fff!important;color:va
  body.pos-sheet-open{overflow:hidden!important;touch-action:none}
  body>#posCartPanel .panel-heading{position:sticky;top:0!important}
 }
+
+
+/* iOS POS sheet: readable panel + persistent workspace header */
+@media(max-width:760px){
+ body>#posCartBackdrop,
+ body>#posCartBackdrop.is-visible{
+  opacity:0!important;visibility:hidden!important;pointer-events:none!important;display:none!important
+ }
+ body>#posCartPanel{
+  top:calc(62px + env(safe-area-inset-top))!important;
+  bottom:0!important;
+  max-height:none!important;
+  height:auto!important;
+  z-index:1001!important;
+  background:#fff!important;
+  opacity:1!important;
+  filter:none!important;
+  -webkit-filter:none!important;
+  transform:translateY(110%)!important;
+  visibility:hidden!important;
+  border-radius:20px 20px 0 0!important;
+  box-shadow:0 -12px 35px rgba(30,49,39,.14)!important;
+  padding-bottom:calc(18px + env(safe-area-inset-bottom))!important
+ }
+ body>#posCartPanel.is-open{
+  transform:translateY(0)!important;
+  visibility:visible!important
+ }
+ body .topbar{
+  position:sticky!important;
+  top:0!important;
+  z-index:1003!important;
+  background:#fff!important
+ }
+ body.pos-sheet-open .topbar{
+  position:fixed!important;
+  left:0!important;right:0!important;top:env(safe-area-inset-top)!important;
+  width:100%!important
+ }
+ body.pos-sheet-open #posCartPanel{
+  top:calc(62px + env(safe-area-inset-top))!important
+ }
+ body.pos-sheet-open>#posMobileCartbar{
+  display:none!important;opacity:0!important;visibility:hidden!important
+ }
+ body.pos-sheet-open{overflow:hidden!important}
+}
