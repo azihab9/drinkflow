@@ -25,18 +25,18 @@
         <button class="nav-link" data-view="pos"><span class="nav-icon">▦</span> Point of Sale</button>
         <button class="nav-link" data-view="orders"><span class="nav-icon">↗</span> Orders</button>
         <div class="nav-divider"></div>
-        <button class="nav-link" data-view="products"><span class="nav-icon">◇</span> Products</button>
-        <button class="nav-link" data-view="inventory"><span class="nav-icon">▤</span> Inventory</button>
-        <button class="nav-link" data-view="purchasing"><span class="nav-icon">＋</span> Purchasing</button>
-        <button class="nav-link" data-view="costRecipe"><span class="nav-icon">◉</span> Cost &amp; Recipe</button>
+        <button class="nav-link" data-view="products" data-owner-only><span class="nav-icon">◇</span> Products</button>
+        <button class="nav-link" data-view="inventory" data-owner-only><span class="nav-icon">▤</span> Inventory</button>
+        <button class="nav-link" data-view="purchasing" data-owner-only><span class="nav-icon">＋</span> Purchasing</button>
+        <button class="nav-link" data-view="costRecipe" data-owner-only><span class="nav-icon">◉</span> Cost &amp; Recipe</button>
         <div class="nav-divider"></div>
-        <button class="nav-link" data-view="expenses"><span class="nav-icon">−</span> Expenses</button>
-        <button class="nav-link" data-view="finance"><span class="nav-icon">⌁</span> Finance</button>
-        <button class="nav-link" data-view="reports"><span class="nav-icon">▥</span> Reports</button>
+        <button class="nav-link" data-view="expenses" data-owner-only><span class="nav-icon">−</span> Expenses</button>
+        <button class="nav-link" data-view="finance" data-owner-only><span class="nav-icon">⌁</span> Finance</button>
+        <button class="nav-link" data-view="reports" data-owner-only><span class="nav-icon">▥</span> Reports</button>
       </nav>
       <div class="sidebar-bottom">
         <div class="store-status"><span class="status-dot"></span><span><b>Store workspace</b><small>Ready to configure</small></span></div>
-        <button class="nav-link" data-view="settings"><span class="nav-icon">⚙</span> Settings</button>
+        <button class="nav-link" data-view="settings" data-owner-only><span class="nav-icon">⚙</span> Settings</button>
         <div class="user-mini"><span class="avatar">M</span><span><b>Business Owner</b><small>Owner account</small></span><span class="more">•••</span></div>
       </div>
     </aside>
@@ -86,6 +86,6 @@
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="assets/js/app.js?v=20261116-cashier-error-detail-v1"></script>
+  <script src="assets/js/app.js?v=20261116-role-access-v1"></script>
 </body>
 </html>
