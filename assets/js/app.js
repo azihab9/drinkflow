@@ -25,7 +25,7 @@ function showApp(profile,user){
   const candidate=sessionStorage.getItem("drinkflow:lastView");
   if(candidate&&Object.prototype.hasOwnProperty.call(labels,candidate))savedView=candidate;
  }catch(error){}
- if(currentRole!=="owner"&&["products","inventory","costRecipe","expenses","finance","reports","settings"].includes(savedView))savedView="pos";
+ if(currentRole!=="owner"&&["products","inventory","costRecipe","expenses","finance","payroll","reports","settings"].includes(savedView))savedView="pos";
  navigate(savedView);
 }
 async function checkSession(){
@@ -620,10 +620,125 @@ async function loadSettings(){
  page.querySelector("#refreshCashiers").onclick=refreshList;
  await refreshList();
 }
+
+async function loadExpenses(){
+ const page=document.querySelector("#pageContent");
+ page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID · OPERASIONAL</div><h1>Expenses</h1><p>Catat pengeluaran di luar pembelian bahan baku dan stok.</p></div><button class="secondary-button" id="refreshExpenses">↻ Refresh</button></div><div class="panel">Memuat pengeluaran...</div>';
+ const [cats,rows]=await Promise.all([
+  supabaseClient.from("expense_categories").select("id,name").eq("is_active",true).order("name"),
+  supabaseClient.from("expenses").select("*,expense_categories(name)").order("expense_date",{ascending:false}).limit(100)
+ ]);
+ const err=cats.error||rows.error;
+ if(err){page.innerHTML='<div class="panel"><h2>Gagal memuat Expenses</h2><p>'+escapeHtml(err.message)+'</p><button class="secondary-button" id="retryExpenses">Coba lagi</button></div>';page.querySelector("#retryExpenses").onclick=loadExpenses;return;}
+ const categories=cats.data||[],expenses=rows.data||[];
+ const total=expenses.reduce((n,x)=>n+Number(x.amount||0),0),today=dfDayOffset(0),month=today.slice(0,7);
+ const monthTotal=expenses.filter(x=>String(x.expense_date).startsWith(month)).reduce((n,x)=>n+Number(x.amount||0),0);
+ const options=categories.map(c=>'<option value="'+c.id+'">'+escapeHtml(c.name)+'</option>').join("");
+ const list=expenses.map(x=>'<tr><td>'+new Intl.DateTimeFormat("id-ID",{dateStyle:"medium",timeZone:"Asia/Jakarta"}).format(new Date(x.expense_date+"T12:00:00+07:00"))+'</td><td><strong>'+escapeHtml(x.expense_categories?.name||"Lain-lain")+'</strong><small class="table-sub">'+escapeHtml(x.description)+'</small></td><td>'+({cash:"Tunai",qris:"QRIS",transfer:"Transfer"}[x.payment_method]||x.payment_method)+'</td><td class="money-cell">'+money(x.amount)+'</td><td><button class="table-action danger-text" data-delete-expense="'+x.id+'">Hapus</button></td></tr>').join("");
+ page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID · OPERASIONAL</div><h1>Expenses</h1><p>Pengeluaran operasional harian, terpisah dari pembelian stok.</p></div><button class="secondary-button" id="refreshExpenses">↻ Refresh</button></div><div class="metric-grid"><article class="metric-card"><div class="metric-top"><span>Pengeluaran bulan ini</span></div><strong>'+money(monthTotal)+'</strong><small class="muted">'+month+'</small></article><article class="metric-card"><div class="metric-top"><span>Total 100 transaksi terbaru</span></div><strong>'+money(total)+'</strong><small class="muted">'+expenses.length+' catatan</small></article><article class="metric-card"><div class="metric-top"><span>Kategori aktif</span></div><strong>'+categories.length+'</strong><small class="muted">Bisa dikembangkan</small></article><article class="metric-card"><div class="metric-top"><span>Jenis biaya</span></div><strong>Operasional</strong><small class="muted">Pembelian stok tetap di Purchasing</small></article></div><div class="panel expense-editor-panel"><div class="panel-heading"><div><h2>Catat pengeluaran</h2><p>Contoh: parkir CFD, makan, transportasi, perlengkapan.</p></div></div><form id="expenseForm" class="finance-form"><label>Tanggal<input name="expense_date" type="date" value="'+today+'" required></label><label>Kategori<select name="category_id" required>'+options+'</select></label><label>Nominal (Rp)<input name="amount" type="number" min="1" step="1" required placeholder="Contoh: 15000"></label><label>Metode pembayaran<select name="payment_method"><option value="cash">Tunai</option><option value="qris">QRIS</option><option value="transfer">Transfer</option></select></label><label class="wide-field">Keterangan<input name="description" maxlength="180" required placeholder="Contoh: Parkir CFD hari Minggu"></label><label class="wide-field">Link bukti / nota (opsional)<input name="receipt_url" type="url" placeholder="https://..."></label><button class="primary-button" type="submit" id="saveExpense">＋ Simpan pengeluaran</button><p class="editor-message" id="expenseMessage"></p></form></div><div class="panel"><div class="panel-heading"><div><h2>Riwayat pengeluaran</h2><p>100 catatan terbaru</p></div></div><div class="table-wrap"><table class="data-table"><thead><tr><th>Tanggal</th><th>Kategori / Keterangan</th><th>Pembayaran</th><th>Nominal</th><th>Aksi</th></tr></thead><tbody>'+(list||'<tr><td colspan="5">Belum ada pengeluaran.</td></tr>')+'</tbody></table></div></div>';
+ page.querySelector("#refreshExpenses").onclick=loadExpenses;
+ page.querySelector("#expenseForm").addEventListener("submit",async e=>{
+  e.preventDefault();const f=e.currentTarget,fd=new FormData(f),btn=page.querySelector("#saveExpense"),msg=page.querySelector("#expenseMessage");
+  btn.disabled=true;btn.textContent="Menyimpan...";
+  const payload={expense_date:fd.get("expense_date"),category_id:fd.get("category_id"),amount:Number(fd.get("amount")),payment_method:fd.get("payment_method"),description:String(fd.get("description")||"").trim(),receipt_url:String(fd.get("receipt_url")||"").trim()||null};
+  const {error}=await supabaseClient.from("expenses").insert(payload);
+  if(error){msg.textContent="Gagal menyimpan: "+error.message;btn.disabled=false;btn.textContent="＋ Simpan pengeluaran";return;}
+  notify("Pengeluaran berhasil dicatat.");await loadExpenses();
+ });
+ page.querySelectorAll("[data-delete-expense]").forEach(btn=>btn.onclick=async()=>{
+  if(!confirm("Hapus catatan pengeluaran ini?"))return;
+  btn.disabled=true;const {error}=await supabaseClient.from("expenses").delete().eq("id",btn.dataset.deleteExpense);
+  if(error){notify("Gagal menghapus: "+error.message);btn.disabled=false;return;}notify("Catatan dihapus.");loadExpenses();
+ });
+}
+async function loadFinance(){
+ const page=document.querySelector("#pageContent");
+ page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID · FINANCE</div><h1>Finance</h1><p>Ringkasan pemasukan dan biaya usaha.</p></div><button class="secondary-button" id="refreshFinance">↻ Refresh</button></div><div class="panel">Menghitung laporan...</div>';
+ const today=dfDayOffset(0),start=today.slice(0,7)+"-01",next=new Date(Date.UTC(Number(today.slice(0,4)),Number(today.slice(5,7)),1)).toISOString().slice(0,10);
+ const [orders,expenses,payroll]=await Promise.all([
+  supabaseClient.from("orders").select("total_amount,net_amount,order_status,ordered_at").eq("order_status","completed").gte("ordered_at",start+"T00:00:00+07:00").lt("ordered_at",next+"T00:00:00+07:00"),
+  supabaseClient.from("expenses").select("amount").gte("expense_date",start).lt("expense_date",next),
+  supabaseClient.from("payroll_items").select("net_amount,paid_at,payroll_periods!inner(period_month)").not("paid_at","is",null).gte("payroll_periods.period_month",start).lt("payroll_periods.period_month",next)
+ ]);
+ const err=orders.error||expenses.error||payroll.error;
+ if(err){page.innerHTML='<div class="panel"><h2>Gagal memuat Finance</h2><p>'+escapeHtml(err.message)+'</p></div>';return;}
+ const revenue=(orders.data||[]).reduce((n,x)=>n+Number(x.total_amount||0),0),net=(orders.data||[]).reduce((n,x)=>n+Number(x.net_amount||0),0),expense=(expenses.data||[]).reduce((n,x)=>n+Number(x.amount||0),0),salary=(payroll.data||[]).reduce((n,x)=>n+Number(x.net_amount||0),0);
+ page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID · FINANCE</div><h1>Finance</h1><p>Periode '+new Intl.DateTimeFormat("id-ID",{month:"long",year:"numeric",timeZone:"Asia/Jakarta"}).format(new Date(start+"T12:00:00+07:00"))+'. Pembelian bahan tidak langsung dibebankan sebagai biaya operasional.</p></div><button class="secondary-button" id="refreshFinance">↻ Refresh</button></div><div class="metric-grid"><article class="metric-card"><div class="metric-top"><span>Omzet selesai</span></div><strong>'+money(revenue)+'</strong><small class="muted">'+orders.data.length+' transaksi completed</small></article><article class="metric-card"><div class="metric-top"><span>Estimasi diterima</span></div><strong>'+money(net)+'</strong><small class="muted">Setelah komisi channel</small></article><article class="metric-card"><div class="metric-top"><span>Pengeluaran operasional</span></div><strong>'+money(expense)+'</strong><small class="muted">Expenses bulan ini</small></article><article class="metric-card"><div class="metric-top"><span>Gaji dibayar</span></div><strong>'+money(salary)+'</strong><small class="muted">Payroll yang sudah dibayar</small></article></div><div class="panel"><h2>Ringkasan arus operasional</h2><div class="finance-summary-row"><span>Estimasi diterima dari penjualan</span><strong>'+money(net)+'</strong></div><div class="finance-summary-row"><span>Pengeluaran operasional</span><strong>− '+money(expense)+'</strong></div><div class="finance-summary-row"><span>Gaji yang sudah dibayar</span><strong>− '+money(salary)+'</strong></div><div class="finance-summary-row finance-total"><span>Sisa setelah biaya tercatat</span><strong>'+money(net-expense-salary)+'</strong></div><p class="overview-note">Ini ringkasan kas sederhana, bukan laba bersih akuntansi: HPP/COGS dan perubahan persediaan belum dikurangkan di sini. Payroll draft yang belum dibayar juga belum mengurangi kas.</p></div>';
+ page.querySelector("#refreshFinance").onclick=loadFinance;
+}
+async function loadPayroll(){
+ if(currentRole!=="owner"){notify("Payroll hanya dapat diakses Owner.");navigate("overview");return;}
+ const page=document.querySelector("#pageContent");
+ page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID · HUMAN RESOURCES</div><h1>Payroll</h1><p>Gaji bulanan tetap, satu kali pembayaran setiap bulan.</p></div><button class="secondary-button" id="refreshPayroll">↻ Refresh</button></div><div class="panel">Memuat data payroll...</div>';
+ const [employees,periods]=await Promise.all([
+  supabaseClient.from("employees").select("*").order("full_name"),
+  supabaseClient.from("payroll_periods").select("*").order("period_month",{ascending:false}).limit(18)
+ ]);
+ const err=employees.error||periods.error;
+ if(err){page.innerHTML='<div class="panel"><h2>Gagal memuat Payroll</h2><p>'+escapeHtml(err.message)+'</p><p>Pastikan migration Expenses & Payroll sudah dijalankan di Supabase.</p></div>';return;}
+ const emps=employees.data||[],runs=periods.data||[];
+ const employeeRows=emps.map(x=>'<tr><td><strong>'+escapeHtml(x.full_name)+'</strong><small class="table-sub">'+escapeHtml(x.employee_code)+' · '+escapeHtml(x.position||"Karyawan")+'</small></td><td>'+money(x.base_salary)+'</td><td><span class="product-status '+(x.is_active?"":"inactive")+'">'+(x.is_active?"Aktif":"Nonaktif")+'</span></td></tr>').join("");
+ const periodRows=runs.map(x=>'<tr><td><strong>'+new Intl.DateTimeFormat("id-ID",{month:"long",year:"numeric",timeZone:"Asia/Jakarta"}).format(new Date(x.period_month+"T12:00:00+07:00"))+'</strong></td><td>'+money(x.total_amount)+'</td><td><span class="purchase-status '+x.status+'">'+(x.status==="paid"?"Dibayar":"Draft")+'</span></td><td><button class="table-action" data-open-payroll="'+x.id+'">Lihat rincian →</button></td></tr>').join("");
+ page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID · HUMAN RESOURCES</div><h1>Payroll</h1><p>Gaji bulanan tetap · pembayaran tunai atau transfer · akses Owner.</p></div><button class="secondary-button" id="refreshPayroll">↻ Refresh</button></div><div class="metric-grid"><article class="metric-card"><div class="metric-top"><span>Karyawan aktif</span></div><strong>'+emps.filter(x=>x.is_active).length+'</strong><small class="muted">Terdaftar</small></article><article class="metric-card"><div class="metric-top"><span>Total gaji pokok bulanan</span></div><strong>'+money(emps.filter(x=>x.is_active).reduce((n,x)=>n+Number(x.base_salary||0),0))+'</strong><small class="muted">Sebelum tunjangan dan potongan</small></article><article class="metric-card"><div class="metric-top"><span>Periode tersimpan</span></div><strong>'+runs.length+'</strong><small class="muted">18 periode terbaru</small></article><article class="metric-card"><div class="metric-top"><span>Akses</span></div><strong>Owner</strong><small class="muted">Data gaji bersifat privat</small></article></div><div class="panel"><div class="panel-heading"><div><h2>Tambah karyawan</h2><p>Daftarkan karyawan dan gaji pokok bulanannya.</p></div></div><form id="employeeForm" class="finance-form"><label>ID karyawan<input name="employee_code" required maxlength="20" placeholder="EMP001"></label><label>Nama lengkap<input name="full_name" required maxlength="100" placeholder="Nama karyawan"></label><label>Jabatan<input name="position" maxlength="80" placeholder="Crew / Barista"></label><label>Gaji pokok bulanan<input name="base_salary" type="number" min="0" step="1000" required placeholder="Contoh: 2000000"></label><label>Tanggal mulai<input name="hire_date" type="date"></label><button class="primary-button" type="submit" id="saveEmployee">＋ Simpan karyawan</button><p class="editor-message" id="employeeMessage"></p></form></div><div class="panel"><div class="panel-heading"><div><h2>Daftar karyawan</h2><p>Data dasar untuk perhitungan gaji.</p></div></div><div class="table-wrap"><table class="data-table"><thead><tr><th>Karyawan</th><th>Gaji pokok</th><th>Status</th></tr></thead><tbody>'+(employeeRows||'<tr><td colspan="3">Belum ada karyawan.</td></tr>')+'</tbody></table></div></div><div class="panel"><div class="panel-heading"><div><h2>Periode penggajian</h2><p>Buat satu periode per bulan. Setiap karyawan dibayar satu kali.</p></div></div><form id="periodForm" class="finance-form period-create-form"><label>Bulan gaji<input name="period_month" type="month" required value="'+today.slice(0,7)+'"></label><button class="primary-button" type="submit" id="createPayrollPeriod" '+(!emps.some(x=>x.is_active)?"disabled":"")+'>＋ Buat payroll bulan ini</button><p class="editor-message" id="periodMessage"></p></form><div class="table-wrap"><table class="data-table"><thead><tr><th>Periode</th><th>Total gaji</th><th>Status</th><th>Rincian</th></tr></thead><tbody>'+(periodRows||'<tr><td colspan="4">Belum ada periode payroll.</td></tr>')+'</tbody></table></div></div><div id="payrollDetail"></div>';
+ page.querySelector("#refreshPayroll").onclick=loadPayroll;
+ page.querySelector("#employeeForm").onsubmit=async e=>{
+  e.preventDefault();const fd=new FormData(e.currentTarget),btn=page.querySelector("#saveEmployee"),msg=page.querySelector("#employeeMessage");btn.disabled=true;btn.textContent="Menyimpan...";
+  const payload={employee_code:String(fd.get("employee_code")).trim().toUpperCase(),full_name:String(fd.get("full_name")).trim(),position:String(fd.get("position")||"").trim()||null,base_salary:Number(fd.get("base_salary")),hire_date:fd.get("hire_date")||null};
+  const {error}=await supabaseClient.from("employees").insert(payload);
+  if(error){msg.textContent="Gagal menyimpan: "+error.message;btn.disabled=false;btn.textContent="＋ Simpan karyawan";return;}notify("Karyawan ditambahkan.");loadPayroll();
+ };
+ page.querySelector("#periodForm").onsubmit=async e=>{
+  e.preventDefault();const month=e.currentTarget.elements.period_month.value,btn=page.querySelector("#createPayrollPeriod"),msg=page.querySelector("#periodMessage");
+  if(!confirm("Buat payroll untuk "+month+" berdasarkan gaji pokok karyawan aktif saat ini?"))return;
+  btn.disabled=true;btn.textContent="Membuat...";
+  const periodDate=month+"-01";
+  const {data:period,error}=await supabaseClient.from("payroll_periods").insert({period_month:periodDate,status:"draft"}).select().single();
+  if(error){msg.textContent="Gagal membuat periode: "+error.message;btn.disabled=false;btn.textContent="＋ Buat payroll bulan ini";return;}
+  const active=emps.filter(x=>x.is_active);
+  const items=active.map(x=>({period_id:period.id,employee_id:x.id,base_salary:Number(x.base_salary||0)}));
+  const {error:itemError}=await supabaseClient.from("payroll_items").insert(items);
+  if(itemError){await supabaseClient.from("payroll_periods").delete().eq("id",period.id);msg.textContent="Gagal membuat rincian: "+itemError.message;btn.disabled=false;btn.textContent="＋ Buat payroll bulan ini";return;}
+  const total=items.reduce((n,x)=>n+x.base_salary,0);await supabaseClient.from("payroll_periods").update({total_amount:total}).eq("id",period.id);
+  notify("Periode payroll dibuat sebagai draft.");loadPayroll();
+ };
+ page.querySelectorAll("[data-open-payroll]").forEach(b=>b.onclick=()=>openPayrollDetail(b.dataset.openPayroll));
+}
+async function openPayrollDetail(periodId){
+ const host=document.querySelector("#payrollDetail");if(!host)return;
+ host.innerHTML='<div class="panel">Memuat rincian payroll...</div>';
+ const [period,items]=await Promise.all([
+  supabaseClient.from("payroll_periods").select("*").eq("id",periodId).single(),
+  supabaseClient.from("payroll_items").select("*,employees(full_name,employee_code,position)").eq("period_id",periodId).order("created_at")
+ ]);
+ if(period.error||items.error){host.innerHTML='<div class="panel">Gagal memuat rincian: '+escapeHtml(period.error?.message||items.error?.message)+'</div>';return;}
+ const p=period.data,rows=items.data||[],isPaid=p.status==="paid";
+ host.innerHTML='<div class="panel payroll-detail"><div class="panel-heading"><div><h2>Rincian payroll · '+new Intl.DateTimeFormat("id-ID",{month:"long",year:"numeric",timeZone:"Asia/Jakarta"}).format(new Date(p.period_month+"T12:00:00+07:00"))+'</h2><p>Status: '+(isPaid?"Sudah dibayar":"Draft · periksa komponen sebelum pembayaran")+'</p></div><button class="secondary-button" id="closePayrollDetail">Tutup</button></div><div class="table-wrap"><table class="data-table"><thead><tr><th>Karyawan</th><th>Gaji pokok</th><th>Tunjangan</th><th>Bonus</th><th>Potongan</th><th>Gaji bersih</th><th>Pembayaran</th></tr></thead><tbody>'+rows.map(x=>'<tr><td><strong>'+escapeHtml(x.employees?.full_name||"Karyawan")+'</strong><small class="table-sub">'+escapeHtml(x.employees?.employee_code||"")+'</small></td><td>'+money(x.base_salary)+'</td><td>'+money(x.allowance)+'</td><td>'+money(x.bonus)+'</td><td>'+money(x.deduction)+'</td><td><strong>'+money(x.net_amount)+'</strong></td><td>'+(x.paid_at?'<span class="purchase-status paid">Dibayar · '+(x.payment_method==="cash"?"Tunai":"Transfer")+'</span>':isPaid? "—":'<button class="table-action" data-pay-item="'+x.id+'">Bayar</button>')+'</td></tr>').join("")+'</tbody></table></div><div class="finance-summary-row finance-total"><span>Total payroll</span><strong>'+money(rows.reduce((n,x)=>n+Number(x.net_amount||0),0))+'</strong></div><p class="overview-note">Tunjangan, bonus, dan potongan dapat diatur sebelum pembayaran dengan tombol Atur komponen.</p><div class="payroll-adjust-list">'+rows.filter(x=>!x.paid_at&&!isPaid).map(x=>'<form class="payroll-adjust-row" data-adjust-item="'+x.id+'"><b>'+escapeHtml(x.employees?.full_name||"Karyawan")+'</b><input name="allowance" type="number" min="0" value="'+x.allowance+'" aria-label="Tunjangan"><input name="bonus" type="number" min="0" value="'+x.bonus+'" aria-label="Bonus"><input name="deduction" type="number" min="0" value="'+x.deduction+'" aria-label="Potongan"><button class="secondary-button" type="submit">Simpan komponen</button></form>').join("")+'</div></div>';
+ host.querySelector("#closePayrollDetail").onclick=()=>host.innerHTML="";
+ host.querySelectorAll("[data-adjust-item]").forEach(form=>form.onsubmit=async e=>{
+  e.preventDefault();const fd=new FormData(form),id=form.dataset.adjustItem;
+  const {error}=await supabaseClient.from("payroll_items").update({allowance:Number(fd.get("allowance")),bonus:Number(fd.get("bonus")),deduction:Number(fd.get("deduction"))}).eq("id",id).is("paid_at",null);
+  if(error){notify("Gagal menyimpan komponen: "+error.message);return;}
+  const refreshed=await supabaseClient.from("payroll_items").select("net_amount").eq("period_id",periodId),sum=(refreshed.data||[]).reduce((n,x)=>n+Number(x.net_amount||0),0);
+  await supabaseClient.from("payroll_periods").update({total_amount:sum}).eq("id",periodId);notify("Komponen gaji diperbarui.");openPayrollDetail(periodId);
+ });
+ host.querySelectorAll("[data-pay-item]").forEach(btn=>btn.onclick=async()=>{
+  const method=prompt("Metode pembayaran: ketik cash untuk Tunai atau transfer untuk Transfer","transfer");
+  if(!method)return;const normalized=method.trim().toLowerCase();if(!["cash","transfer"].includes(normalized)){notify("Metode harus cash atau transfer.");return;}
+  const reference=prompt("Catatan / referensi pembayaran (opsional):","")||null;
+  if(!confirm("Tandai gaji karyawan ini sudah dibayar?"))return;
+  btn.disabled=true;const {error}=await supabaseClient.from("payroll_items").update({payment_method:normalized,payment_reference:reference,paid_at:new Date().toISOString()}).eq("id",btn.dataset.payItem).is("paid_at",null);
+  if(error){notify("Gagal mencatat pembayaran: "+error.message);btn.disabled=false;return;}
+  const fresh=await supabaseClient.from("payroll_items").select("net_amount,paid_at").eq("period_id",periodId);
+  const allPaid=(fresh.data||[]).length>0&&(fresh.data||[]).every(x=>x.paid_at),sum=(fresh.data||[]).reduce((n,x)=>n+Number(x.net_amount||0),0);
+  await supabaseClient.from("payroll_periods").update({status:allPaid?"paid":"draft",paid_at:allPaid?new Date().toISOString():null,total_amount:sum}).eq("id",periodId);
+  notify("Pembayaran gaji dicatat.");openPayrollDetail(periodId);
+ });
+}
+
 function navigate(view){
  const ownerOnlyViews=["products","inventory","costRecipe","expenses","finance","reports","settings"];
  if(currentRole!=="owner"&&ownerOnlyViews.includes(view)){notify("Menu ini hanya tersedia untuk Owner.");return;}
- if(view!=="pos")cleanupPOSOverlays();try{sessionStorage.setItem("drinkflow:lastView",view);}catch(error){}document.querySelector("#breadcrumbTitle").textContent=labels[view]||"Overview";document.querySelectorAll(".nav-link[data-view]").forEach(button=>button.classList.toggle("active",button.dataset.view===view));document.querySelector("#sidebar").classList.remove("open");if(view==="products"){loadProducts();return;}if(view==="pos"){loadPOS();return;}if(view==="orders"){loadOrders();return;}if(view==="purchasing"){loadPurchasing();return;}if(view==="inventory"){loadInventory();return;}if(view==="costRecipe"){loadCostRecipe();return;}if(view==="overview"){loadOverview();return;}if(view==="reports"){loadReports();return;}if(view==="settings"){loadSettings();return;}if(view!=="overview"){notify((labels[view]||view)+" module sedang disiapkan.");return;}}
+ if(view!=="pos")cleanupPOSOverlays();try{sessionStorage.setItem("drinkflow:lastView",view);}catch(error){}document.querySelector("#breadcrumbTitle").textContent=labels[view]||"Overview";document.querySelectorAll(".nav-link[data-view]").forEach(button=>button.classList.toggle("active",button.dataset.view===view));document.querySelector("#sidebar").classList.remove("open");if(view==="products"){loadProducts();return;}if(view==="pos"){loadPOS();return;}if(view==="orders"){loadOrders();return;}if(view==="purchasing"){loadPurchasing();return;}if(view==="inventory"){loadInventory();return;}if(view==="costRecipe"){loadCostRecipe();return;}if(view==="overview"){loadOverview();return;}if(view==="reports"){loadReports();return;}if(view==="expenses"){loadExpenses();return;}if(view==="finance"){loadFinance();return;}if(view==="payroll"){loadPayroll();return;}if(view==="settings"){loadSettings();return;}if(view!=="overview"){notify((labels[view]||view)+" module sedang disiapkan.");return;}}
 document.querySelectorAll("[data-view]").forEach(button=>button.addEventListener("click",()=>navigate(button.dataset.view)));
 document.querySelector("#mobileMenu").addEventListener("click",()=>document.querySelector("#sidebar").classList.toggle("open"));
 if(initSupabase()){
