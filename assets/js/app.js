@@ -602,7 +602,14 @@ async function loadSettings(){
   event.preventDefault();const fd=new FormData(form),payload={action:"create",full_name:String(fd.get("full_name")||"").trim(),cashier_code:String(fd.get("cashier_code")||"").trim().toUpperCase(),pin:String(fd.get("pin")||"")};
   button.disabled=true;button.textContent="Membuat akun...";message.textContent="";
   const {data,error}=await supabaseClient.functions.invoke("cashier-auth",{body:payload});
-  if(error||data?.error){message.textContent="Gagal membuat akun: "+(data?.error||error.message);button.disabled=false;button.textContent="＋ Buat akun kasir";return;}
+  if(error||data?.error){
+   let detail=data?.error||error?.message||"Permintaan gagal.";
+   if(error?.context instanceof Response){
+    try{const body=await error.context.clone().json();detail=body.error||body.message||detail;}catch(parseError){}
+   }
+   message.textContent="Gagal membuat akun: "+detail;
+   button.disabled=false;button.textContent="＋ Buat akun kasir";return;
+  }
   message.textContent="Akun "+data.cashier_code+" berhasil dibuat.";
   form.reset();form.elements.cashier_code.value="KSR001";
   button.disabled=false;button.textContent="＋ Buat akun kasir";refreshList();
