@@ -1209,3 +1209,15 @@ input:focus,select:focus,textarea:focus,.pos-select:focus{outline:none;border-co
 .opening-stock-editor .ingredient-form-grid input{width:100%;padding:12px;border:1px solid #DDE8DA;border-radius:11px;background:#fff}
 .opening-stock-editor small{font-weight:400;color:#849184;line-height:1.45}
 @media(max-width:650px){.inventory-actions{display:flex;flex-wrap:wrap;gap:8px}.opening-stock-backdrop{align-items:end!important;padding:10px!important;padding-bottom:calc(10px + env(safe-area-inset-bottom))!important}.opening-stock-editor{width:100%!important;max-height:90vh!important;max-height:90dvh!important;border-radius:20px!important;padding:19px!important}.opening-stock-editor .ingredient-form-grid{grid-template-columns:1fr!important}}
+
+
+/* Dual authentication modes: Owner email and cashier ID + PIN */
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:5px;margin:0 0 20px;background:#edf3ec;border:1px solid #e0eade;border-radius:12px}
+.auth-tab{height:40px;border:0;border-radius:9px;background:transparent;color:#718273;font:700 13px "DM Sans",sans-serif;cursor:pointer;transition:all .18s ease}
+.auth-tab.active{background:rgba(255,255,255,.96);color:#456b4b;box-shadow:0 2px 9px rgba(50,75,51,.09)}
+#ownerLoginForm[hidden],#cashierLoginForm[hidden]{display:none!important}
+#ownerLoginForm label,#cashierLoginForm label{display:block;font-size:12px;font-weight:700;color:#46584a;margin:16px 0 7px}
+#ownerLoginForm input,#cashierLoginForm input{width:100%;height:48px;border:1px solid #dce6dc;border-radius:11px;padding:0 13px;font:14px "DM Sans",sans-serif;color:#203327;background:#fbfdfb;outline:none}
+#ownerLoginForm input:focus,#cashierLoginForm input:focus{border-color:#8fbd98;box-shadow:0 0 0 3px #e7f2e8}
+#cashierCode{text-transform:uppercase;letter-spacing:1px;font-weight:700}
+#cashierPin{letter-spacing:7px;font-size:19px!important;font-weight:800}
