@@ -590,3 +590,17 @@ body{background:radial-gradient(ellipse at 8% 0%,rgba(129,114,168,.09),transpare
 .product-item{transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}
 .product-item:hover{transform:translateY(-2px);box-shadow:0 7px 16px rgba(36,63,48,.08);border-color:#BFD2C4}
 @media(max-width:760px){.sidebar{background:linear-gradient(180deg,#1D4937,#245743)}}
+
+
+/* Keep the curated triadic accents, switch all page surfaces to clean white */
+body{background:#fff!important;color:#26382F}
+.main-area{background:#fff}
+.topbar{background:#fff!important;border-bottom:1px solid #E9ECE8}
+.page-content{background:#fff}
+.panel{background:#fff!important}
+.metric-card{box-shadow:0 10px 24px rgba(36,63,48,.10)}
+.getting-started{background:#fff!important;border:1px solid #E7EAE5!important;color:#26382F}
+.getting-started h2,.getting-started p,.getting-started small{color:#26382F!important}
+.date-chip{background:#fff!important;border-color:#E7EAE5!important}
+.data-table tbody tr:nth-child(even){background:#FAFBFA}
+@media(max-width:760px){body{background:#fff!important}.main-area,.page-content{background:#fff}}
