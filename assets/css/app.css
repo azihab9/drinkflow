@@ -962,3 +962,15 @@ html,body,.app-shell,.main-area,.page-content{background:#fff!important;color:va
  .pos-mobile-cartbar{left:9px;right:9px}
  .pos-mobile-cartbar>button{padding:11px 10px}
 }
+
+
+/* POS cart sheet portal layer fix — keep sheet above backdrop on iOS */
+@media(max-width:760px){
+ body>#posCartBackdrop{position:fixed!important;inset:0!important;z-index:1000!important}
+ body>#posCartPanel{position:fixed!important;z-index:1001!important;isolation:isolate;transform:translateY(110%);visibility:hidden}
+ body>#posCartPanel.is-open{transform:translateY(0)!important;visibility:visible!important}
+ body>#posMobileCartbar{z-index:999!important}
+ body.pos-sheet-open>#posMobileCartbar{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+ body.pos-sheet-open{overflow:hidden!important;touch-action:none}
+ body>#posCartPanel .panel-heading{position:sticky;top:0!important}
+}
