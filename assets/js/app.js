@@ -25,7 +25,7 @@ function showApp(profile,user){
   const candidate=sessionStorage.getItem("drinkflow:lastView");
   if(candidate&&Object.prototype.hasOwnProperty.call(labels,candidate))savedView=candidate;
  }catch(error){}
- if(currentRole!=="owner"&&["products","inventory","purchasing","costRecipe","expenses","finance","reports","settings"].includes(savedView))savedView="pos";
+ if(currentRole!=="owner"&&["products","inventory","costRecipe","expenses","finance","reports","settings"].includes(savedView))savedView="pos";
  navigate(savedView);
 }
 async function checkSession(){
@@ -314,7 +314,6 @@ async function loadOrders(){
  document.querySelectorAll("[data-confirm-order]").forEach(b=>b.addEventListener("click",()=>confirmPayment(b.dataset.confirmOrder,b)));
 }
 async function confirmPayment(orderId,button){
- if(currentRole!=="owner"){notify("Konfirmasi pembayaran hanya dapat dilakukan Owner.");return;}
  if(!window.confirm("Pastikan pembayaran sudah benar-benar diterima. Konfirmasi transaksi ini?"))return;
  button.disabled=true;button.textContent="Mengonfirmasi...";
  try{
@@ -328,7 +327,6 @@ async function confirmPayment(orderId,button){
 
 async function loadPurchasing(){
  const page=document.querySelector("#pageContent");
- if(currentRole!=="owner"){page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID</div><h1>Purchasing</h1><p>Modul pembelian dikelola oleh Owner.</p></div></div><div class="panel"><h2>Akses Owner diperlukan</h2><p>Hubungi Owner untuk membuat atau menerima pembelian.</p></div>';return;}
  page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID · INVENTORY CONTROL</div><h1>Purchasing</h1><p>Kelola pembelian bahan baku dan penerimaan barang.</p></div><button class="primary-button" id="newPurchase">＋ Pembelian baru</button></div><div class="panel">Memuat data pembelian...</div>';
  const [purchases,suppliers,ingredients]=await Promise.all([
   supabaseClient.from("purchases").select("*").order("created_at",{ascending:false}).limit(50),
@@ -623,7 +621,7 @@ async function loadSettings(){
  await refreshList();
 }
 function navigate(view){
- const ownerOnlyViews=["products","inventory","purchasing","costRecipe","expenses","finance","reports","settings"];
+ const ownerOnlyViews=["products","inventory","costRecipe","expenses","finance","reports","settings"];
  if(currentRole!=="owner"&&ownerOnlyViews.includes(view)){notify("Menu ini hanya tersedia untuk Owner.");return;}
  if(view!=="pos")cleanupPOSOverlays();try{sessionStorage.setItem("drinkflow:lastView",view);}catch(error){}document.querySelector("#breadcrumbTitle").textContent=labels[view]||"Overview";document.querySelectorAll(".nav-link[data-view]").forEach(button=>button.classList.toggle("active",button.dataset.view===view));document.querySelector("#sidebar").classList.remove("open");if(view==="products"){loadProducts();return;}if(view==="pos"){loadPOS();return;}if(view==="orders"){loadOrders();return;}if(view==="purchasing"){loadPurchasing();return;}if(view==="inventory"){loadInventory();return;}if(view==="costRecipe"){loadCostRecipe();return;}if(view==="overview"){loadOverview();return;}if(view==="reports"){loadReports();return;}if(view==="settings"){loadSettings();return;}if(view!=="overview"){notify((labels[view]||view)+" module sedang disiapkan.");return;}}
 document.querySelectorAll("[data-view]").forEach(button=>button.addEventListener("click",()=>navigate(button.dataset.view)));
