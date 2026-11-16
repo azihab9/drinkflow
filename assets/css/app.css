@@ -160,3 +160,9 @@ footer{color:#8b978e}
 .order-notes{margin:12px 0 0;padding:10px;background:#f7faf7;border-radius:8px;color:var(--muted);font-size:11px}
 .order-empty{text-align:center;color:var(--muted);padding:35px}
 @media(max-width:600px){.order-summary{grid-template-columns:1fr 1fr}.order-summary-card:last-child{grid-column:1/-1}.order-card{padding:15px}.order-card-top,.order-card-bottom{align-items:flex-start;flex-direction:column}.order-card-bottom .primary-button{width:100%}.order-totals{display:grid;gap:7px}}
+
+/* Live overview and completed-only reports */
+.overview-week{padding:20px;border-radius:11px;background:#f3f8f3;border:1px solid #e5eee5}
+.overview-week strong{display:block;font:800 27px Manrope,sans-serif;color:#294332}
+.overview-week small,.overview-note{display:block;margin-top:8px;color:#78877c;font-size:12px;line-height:1.6}
+.overview-note{margin:12px 0 0}
