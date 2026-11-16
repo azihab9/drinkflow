@@ -294,7 +294,7 @@ function openPurchaseEditor(ingredients,suppliers){
   const name=(ingredient?.name||"").toLowerCase(),unit=ingredient?.unit||"";
   if(name.includes("uht"))return [{label:"Kotak 1 liter",unit:"kotak",factor:1000},{label:"Karton 12 × 1 liter",unit:"karton",factor:12000},{label:"Mililiter",unit:"ml",factor:1}];
   if(name.includes("matcha")||name.includes("bubuk"))return [{label:"Kilogram",unit:"kg",factor:1000},{label:"Gram",unit:"gram",factor:1}];
-  if(name.includes("es batu"))return [{label:"Kilogram",unit:"kg",factor:1000},{label:"Gram",unit:"gram",factor:1}];
+  if(name.includes("es batu"))return [{label:"Kemasan 5 kg",unit:"kemasan-5kg",factor:5000},{label:"Kilogram",unit:"kg",factor:1000},{label:"Gram",unit:"gram",factor:1}];
   return [{label:unit,unit:unit,factor:1}];
  };
  const updateRow=(row)=>{
