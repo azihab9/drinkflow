@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
       if (!/^KSR[0-9]{3,8}$/.test(code)) return json(400, { error: "ID Kasir harus berformat KSR001." });
       if (!validPin(pin)) return json(400, { error: "PIN harus tepat 6 digit." });
       const email = `cashier+${code.toLowerCase()}@drinkflow.invalid`;
-      const randomPassword = Array.from(crypto.getRandomValues(new Uint8Array(48)), b => b.toString(16).padStart(2, "0")).join("");
+      const randomPassword = Array.from(crypto.getRandomValues(new Uint8Array(32)), b => b.toString(16).padStart(2, "0")).join("");
       const { data: created, error: createError } = await admin.auth.admin.createUser({
         email, password: randomPassword, email_confirm: true,
         user_metadata: { full_name: fullName, account_type: "cashier" },
