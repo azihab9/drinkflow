@@ -304,7 +304,7 @@ function openPurchaseEditor(ingredients,suppliers){
   if(packages.some(p=>p.unit===previous))select.value=previous;
   const chosen=packages.find(p=>p.unit===select.value)||packages[0];
   const qty=Number(row.querySelector(".purchase-quantity").value)||0,cost=Number(row.querySelector(".purchase-cost").value)||0;
-  row.querySelector(".purchase-unit").textContent=ingredient?('Stok masuk: '+(qty*chosen.factor).toLocaleString("id-ID")+' '+ingredient.unit+' · biaya/'+ingredient.unit+' '+money(cost/chosen.factor)):"Pilih bahan terlebih dahulu";
+  row.querySelector(".purchase-unit").textContent=ingredient?('Stok masuk: '+(qty*chosen.factor).toLocaleString("id-ID")+' '+ingredient.unit+' · biaya/'+ingredient.unit+' Rp '+new Intl.NumberFormat("id-ID",{minimumFractionDigits:0,maximumFractionDigits:2}).format(cost/chosen.factor)):"Pilih bahan terlebih dahulu";
   updateTotal();
  };
  const addLine=()=>{
