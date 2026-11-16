@@ -197,3 +197,8 @@ footer{color:#8b978e}
 .purchase-total strong{font:800 21px Manrope,sans-serif;color:#294332}
 .inventory-table{min-width:760px}
 @media(max-width:650px){.purchase-editor{padding:19px}.purchase-line-input{grid-template-columns:1fr 1fr;align-items:end}.purchase-line-input label:first-child{grid-column:1/-1}.purchase-line-input small{padding:0}.purchase-card{padding:14px}.purchase-card-head,.purchase-card-foot{align-items:flex-start}.purchase-card-foot{flex-direction:column}.purchase-card-foot .primary-button{width:100%}}
+
+/* Package conversion purchase form */
+.purchase-line-input{grid-template-columns:minmax(145px,1.2fr) minmax(130px,1fr) minmax(95px,.7fr) minmax(125px,1fr) minmax(190px,1.3fr) 32px}
+.purchase-line-input .purchase-unit{white-space:normal;line-height:1.45;padding:0 2px 8px}
+@media(max-width:850px){.purchase-line-input{grid-template-columns:1fr 1fr}.purchase-line-input label:first-child{grid-column:1/-1}.purchase-line-input .purchase-unit{grid-column:1/-1}.purchase-line-input .remove-purchase-line{grid-column:2;justify-self:end}}
