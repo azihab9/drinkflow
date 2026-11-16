@@ -668,6 +668,7 @@ async function loadFinance(){
 }
 async function loadPayroll(){
  if(currentRole!=="owner"){notify("Payroll hanya dapat diakses Owner.");navigate("overview");return;}
+ const today=dfDayOffset(0);
  const page=document.querySelector("#pageContent");
  page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID · HUMAN RESOURCES</div><h1>Payroll</h1><p>Gaji bulanan tetap, satu kali pembayaran setiap bulan.</p></div><button class="secondary-button" id="refreshPayroll">↻ Refresh</button></div><div class="panel">Memuat data payroll...</div>';
  let employees,periods;
