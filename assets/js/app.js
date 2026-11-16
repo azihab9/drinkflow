@@ -25,6 +25,7 @@ function showApp(profile,user){
   const candidate=sessionStorage.getItem("drinkflow:lastView");
   if(candidate&&Object.prototype.hasOwnProperty.call(labels,candidate))savedView=candidate;
  }catch(error){}
+ if(currentRole!=="owner"&&["products","inventory","purchasing","costRecipe","expenses","finance","reports","settings"].includes(savedView))savedView="pos";
  navigate(savedView);
 }
 async function checkSession(){
