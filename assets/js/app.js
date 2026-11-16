@@ -124,7 +124,7 @@ function openProductEditor(product,channels,priceMap){
   return '<label class="price-field"><span>'+escapeHtml(c.name)+'</span><input type="number" min="0" step="500" name="price_'+c.id+'" placeholder="Harga Rp" value="'+value+'"></label>';
  }).join("");
  host.innerHTML='<div class="editor-backdrop"><form class="product-editor" id="productForm"><div class="editor-heading"><div><div class="eyebrow">PRODUCT MANAGEMENT</div><h2>'+(editing?"Edit produk":"Tambah produk")+'</h2><p>Isi informasi produk dan harga setiap channel.</p></div><button type="button" class="icon-close" id="closeEditor">×</button></div><div class="form-grid"><label>SKU<input name="sku" required maxlength="30" value="'+escapeHtml(product?.sku||"")+'" placeholder="MTC012"></label><label>Nama produk<input name="name" required value="'+escapeHtml(product?.name||"")+'" placeholder="Nama minuman"></label><label>Satuan<input name="unit" required value="'+escapeHtml(product?.unit||"cup")+'" placeholder="cup"></label><label class="wide-field">Deskripsi<textarea name="description" rows="2" placeholder="Deskripsi singkat (opsional)">'+escapeHtml(product?.description||"")+'</textarea></label></div><div class="price-section"><h3>Harga jual per channel</h3><div class="price-grid">'+prices+'</div></div>'+(editing?'<label class="active-toggle"><input type="checkbox" name="is_active" '+(product.is_active===false?"":"checked")+'> Produk aktif dan dapat dijual</label>':'')+'<div class="editor-actions"><button type="button" class="secondary-button" id="cancelEditor">Batal</button><button type="submit" class="primary-button" id="saveProduct">Simpan produk</button></div><p class="editor-message" id="editorMessage"></p></form></div>';
- const close=()=>{host.innerHTML="";};
+ const close=()=>{editorOverlay.remove();host.innerHTML="";};
  document.querySelector("#closeEditor").addEventListener("click",close);
  document.querySelector("#cancelEditor").addEventListener("click",close);
  document.querySelector("#productForm").addEventListener("submit",async event=>{
@@ -456,6 +456,8 @@ function openRecipeEditor(product,ingredients,activeRecipe,currentLines){
  let items=initial.length?initial:[{ingredient_id:"",quantity:"",unit:""}];
  const options='<option value="">Pilih bahan baku</option>'+ingredients.map(x=>'<option value="'+x.id+'">'+escapeHtml(x.name)+' · '+escapeHtml(x.unit)+'</option>').join("");
  host.innerHTML='<div class="editor-backdrop recipe-editor-backdrop"><form class="recipe-editor" id="recipeEditorForm"><div class="editor-heading"><div><div class="eyebrow">RECIPE MANAGEMENT · '+escapeHtml(product.sku)+'</div><h2>Edit resep '+escapeHtml(product.name)+'</h2><p>'+(activeRecipe?'Versi aktif v'+activeRecipe.version:'Belum ada resep aktif · akan dibuat sebagai versi pertama')+'</p></div><button type="button" class="icon-close" id="closeRecipeEditor">×</button></div><label class="recipe-name-field">Nama resep<input name="recipe_name" required maxlength="100" value="'+escapeHtml(activeRecipe?.name||product.name+' - Standar')+'"></label><div class="recipe-lines-heading"><div><h3>Komposisi bahan</h3><p>Takaran menggunakan satuan dasar Inventory.</p></div><button type="button" class="secondary-button" id="addRecipeIngredient">＋ Tambah bahan</button></div><div id="recipeIngredientRows"></div><div class="recipe-editor-hint">Pastikan satuan takaran sesuai dengan satuan bahan baku. HPP akan dihitung ulang setelah resep disimpan.</div><div class="editor-actions"><button type="button" class="secondary-button" id="cancelRecipeEditor">Batal</button><button type="submit" class="primary-button" id="saveRecipeButton">Simpan versi resep</button></div><p class="editor-message" id="recipeEditorMessage"></p></form></div>';
+ const editorOverlay=host.firstElementChild;
+ document.body.appendChild(editorOverlay);
  const rowsHost=document.querySelector("#recipeIngredientRows");
  const renderRows=()=>{
   rowsHost.innerHTML=items.map((item,index)=>{
@@ -493,6 +495,7 @@ function openRecipeEditor(product,ingredients,activeRecipe,currentLines){
    if(error)throw error;
    if(!data?.success)throw new Error("Penyimpanan resep tidak berhasil.");
    notify("Resep tersimpan sebagai versi v"+data.version+".");
+   close();
    await loadCostRecipe();
   }catch(error){message.textContent="Gagal menyimpan resep: "+error.message;button.disabled=false;button.textContent="Simpan versi resep";}
  };
