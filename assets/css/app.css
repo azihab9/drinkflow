@@ -661,3 +661,57 @@ body{background:#fff!important;color:#26382F}
 .secondary-button:hover{background:#DCE7DC!important;border-color:#B9CDBB!important}
 .welcome-row .eyebrow{background:#EAF0E8!important;border-color:#D8E3D7!important;color:#5E7964!important}
 .welcome-row h1 em{color:#78947B!important}
+
+
+/* DrinkFlow comfort pass: restrained sage, consistent cards, stronger readability */
+:root{
+ --df-sage-900:#3E5847;
+ --df-sage-800:#4E6B56;
+ --df-sage-700:#5F8067;
+ --df-sage-600:#78977D;
+ --df-sage-200:#DCE7DD;
+ --df-sage-100:#EEF3EE;
+ --df-ink:#29382E;
+ --df-muted:#68766D;
+}
+body,.main-area,.page-content{background:#fff!important;color:var(--df-ink)!important}
+.sidebar{background:linear-gradient(180deg,#405B49 0%,#4C6954 100%)!important}
+.brand,.brand strong{color:#fff!important}
+.brand small,.sidebar .muted,.sidebar small{color:#D8E2D9!important}
+.brand-mark{background:#E8EFE8!important;color:#405B49!important}
+.nav-link{color:#E3EBE4!important}
+.nav-link:hover{background:rgba(255,255,255,.1)!important;color:#fff!important}
+.nav-link.active{background:#E5EDE5!important;color:#3E5847!important;box-shadow:inset 3px 0 #78977D!important}
+.store-status{background:rgba(255,255,255,.09)!important;border-color:rgba(255,255,255,.16)!important}
+.topbar{background:#fff!important}
+.welcome-row h1,.panel-heading h2{color:#344B3B!important}
+.welcome-row p,.panel-heading p,.muted{color:#68766D!important}
+.welcome-row .eyebrow{background:#EEF3EE!important;border-color:#DCE7DD!important;color:#4E6B56!important}
+.primary-button{background:#5F8067!important;color:#fff!important;box-shadow:0 5px 14px rgba(62,88,71,.16)!important}
+.primary-button:hover{background:#4E6B56!important}
+.metric-card,.metric-card:nth-child(1),.metric-card:nth-child(2),.metric-card:nth-child(3),.metric-card:nth-child(4){
+ background:linear-gradient(135deg,#6E8D74 0%,#829D86 100%)!important;
+ color:#fff!important;border:1px solid rgba(62,88,71,.08)!important;
+ box-shadow:0 7px 18px rgba(62,88,71,.10)!important;
+}
+.metric-card:nth-child(2){background:linear-gradient(135deg,#78947B 0%,#8DA591 100%)!important}
+.metric-card:nth-child(3){background:linear-gradient(135deg,#58765F 0%,#76927B 100%)!important}
+.metric-card:nth-child(4){background:linear-gradient(135deg,#819B84 0%,#9BAF9D 100%)!important}
+.metric-card .metric-top,.metric-card>strong,.metric-card small,.metric-card .muted{color:#fff!important}
+.metric-card:after{background:#fff!important;opacity:.10!important}
+.metric-icon,.metric-card .metric-icon{background:rgba(255,255,255,.16)!important;color:#fff!important}
+.panel{background:#fff!important;border:1px solid #E5EBE5!important;box-shadow:0 4px 16px rgba(41,56,46,.035)!important}
+.data-table th{background:#EDF2ED!important;color:#4E6955!important}
+.data-table td{color:#46564A!important}
+.data-table tbody tr:nth-child(even){background:#FAFBFA!important}
+.data-table tbody tr:hover{background:#F1F5F1!important}
+.channel-badge,.channel-row:nth-child(n) .channel-badge{background:#E8F0E8!important;color:#4E6B56!important}
+.getting-started{background:#F5F8F5!important;border-color:#E5EBE5!important}
+.getting-started h2,.getting-started p,.getting-started small{color:#405B49!important}
+.product-item,.product-item:nth-child(n){background:#F7F9F7!important;border-color:#E5EBE5!important;color:#405146!important}
+.product-item span:last-child,.text-button{color:#52745A!important}
+.pos-product,.pos-product:nth-child(n){background:#fff!important;border-color:#E3EAE3!important}
+.secondary-button{background:#EEF3EE!important;border-color:#DCE7DD!important;color:#4E6B56!important}
+.secondary-button:hover{background:#E2EBE3!important}
+.date-chip{background:#fff!important;border-color:#E5EBE5!important;color:#68766D!important}
+@media(max-width:760px){.sidebar{background:linear-gradient(180deg,#405B49,#4C6954)!important}}
