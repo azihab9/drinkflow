@@ -833,3 +833,63 @@ html,body,.app-shell,.main-area,.page-content{background:#fff!important;color:va
 .pos-product:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 9px 20px rgba(52,79,91,.09)!important;border-color:#9CBDB3!important}
 @media(max-width:760px){.sidebar{background:linear-gradient(180deg,#344F5B,#3D5D68)!important}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+
+/* DrinkFlow — Soft Matcha & Honey palette */
+:root{
+ --df-matcha:#789B72;
+ --df-matcha-deep:#587A55;
+ --df-matcha-pale:#EAF1E5;
+ --df-honey:#E8C66A;
+ --df-honey-pale:#FBF4DE;
+ --df-cream:#FFFDF7;
+ --df-ink:#354438;
+ --df-muted:#778276;
+ --df-line:#E7EBDD;
+}
+html,body,.app-shell,.main-area,.page-content{background:#fff!important;color:var(--df-ink)!important}
+.sidebar{background:linear-gradient(180deg,#587A55 0%,#6F9068 100%)!important;color:#fff}
+.brand,.brand strong{color:#fff!important}
+.brand small,.sidebar .muted,.sidebar small{color:#E7EEE2!important}
+.brand-mark{background:#EAF1E5!important;color:#587A55!important;box-shadow:none!important}
+.nav-link{color:#EAF1E5!important;transition:background .22s ease,color .22s ease,transform .22s ease}
+.nav-link:hover{background:rgba(255,255,255,.12)!important;color:#fff!important;transform:translateX(2px)}
+.nav-link.active{background:#F4F7EF!important;color:#496746!important;box-shadow:inset 3px 0 #E8C66A!important;font-weight:800}
+.store-status{background:rgba(255,255,255,.1)!important;border:1px solid rgba(255,255,255,.17)!important;color:#fff}
+.store-status *{color:inherit}
+.topbar{background:#fff!important;border-bottom:1px solid var(--df-line)!important}
+.welcome-row h1,.panel-heading h2{color:#496746!important}
+.welcome-row h1 em{color:#789B72!important}
+.welcome-row .eyebrow{background:#EAF1E5!important;border:1px solid #DCE7D7!important;color:#587A55!important}
+.welcome-row p,.panel-heading p{color:#778276!important}
+.primary-button{background:#789B72!important;color:#fff!important;border:0!important;box-shadow:0 6px 16px rgba(88,122,85,.16)!important;transition:transform .2s ease,background .2s ease,box-shadow .2s ease}
+.primary-button:hover{background:#587A55!important;transform:translateY(-2px)}
+.metric-card,.metric-card:nth-child(1),.metric-card:nth-child(2),.metric-card:nth-child(3),.metric-card:nth-child(4){
+ background:linear-gradient(135deg,#789B72,#91AD83)!important;color:#354438!important;border:1px solid rgba(88,122,85,.08)!important;box-shadow:0 8px 20px rgba(88,122,85,.10)!important;transition:transform .25s ease,box-shadow .25s ease
+}
+.metric-card:nth-child(2){background:linear-gradient(135deg,#E8C66A,#F0D98D)!important}
+.metric-card:nth-child(3){background:linear-gradient(135deg,#8BA783,#A8BD9B)!important}
+.metric-card:nth-child(4){background:linear-gradient(135deg,#E5D18D,#F0E2B5)!important}
+.metric-card .metric-top,.metric-card>strong,.metric-card small,.metric-card .muted{color:#354438!important}
+.metric-card:after{background:#fff!important;opacity:.22!important}
+.metric-icon,.metric-card .metric-icon{background:rgba(255,255,255,.42)!important;color:#496746!important}
+.panel{background:#fff!important;border:1px solid #E7EBDD!important;box-shadow:0 5px 18px rgba(53,68,56,.045)!important;transition:transform .22s ease,box-shadow .22s ease}
+.data-table th{background:#EEF3E9!important;color:#587A55!important}
+.data-table td{color:#536052!important}
+.data-table tbody tr:nth-child(even){background:#FCFDFB!important}
+.data-table tbody tr:hover{background:#F4F7EF!important}
+.channel-badge,.channel-row:nth-child(n) .channel-badge{background:#EAF1E5!important;color:#587A55!important}
+.getting-started{background:linear-gradient(120deg,#EAF1E5,#FBF4DE)!important;border:1px solid #E7EBDD!important}
+.getting-started h2,.getting-started p,.getting-started small{color:#496746!important}
+.setup-progress{background:#E6ECDF!important}.setup-progress span{background:#E8C66A!important}
+.product-item,.product-item:nth-child(n){background:#F5F8F1!important;border:1px solid #E7EBDD!important;color:#465343!important}
+.product-item span:last-child,.text-button{color:#587A55!important}
+.pos-product,.pos-product:nth-child(n){background:#fff!important;border:1px solid #E7EBDD!important;transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}
+.pos-product:nth-child(3n+2),.pos-product:nth-child(3n){background:#FFFDF7!important;border-color:#EEE8D6!important}
+.secondary-button{background:#EEF3E9!important;border:1px solid #DDE7D7!important;color:#587A55!important;transition:transform .2s ease,background .2s ease}
+.secondary-button:hover{background:#E2EBD9!important;transform:translateY(-1px)}
+.date-chip{background:#fff!important;border-color:#E7EBDD!important;color:#778276!important}
+.metric-card:hover{transform:translateY(-4px);box-shadow:0 14px 26px rgba(88,122,85,.14)!important}
+.panel:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(53,68,56,.075)!important}
+.pos-product:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 9px 20px rgba(53,68,56,.09)!important;border-color:#B7C9AE!important}
+@media(max-width:760px){.sidebar{background:linear-gradient(180deg,#587A55,#6F9068)!important}}
