@@ -421,12 +421,16 @@ function openIngredientEditor(){
  const host=document.querySelector("#ingredientEditorHost");
  if(!host)return;
  host.innerHTML='<div class="editor-backdrop"><form class="ingredient-editor" id="ingredientForm"><div class="editor-heading"><div><div class="eyebrow">INVENTORY MANAGEMENT</div><h2>Tambah bahan baku</h2><p>Daftarkan bahan terlebih dahulu, lalu catat stok masuk melalui Purchasing.</p></div><button type="button" class="icon-close" id="closeIngredientEditor">×</button></div><div class="ingredient-form-grid"><label>SKU bahan<input name="sku" required maxlength="30" placeholder="ING006" autocomplete="off"></label><label>Nama bahan<input name="name" required maxlength="100" placeholder="Contoh: Sirup Vanilla"></label><label>Satuan dasar<select name="unit" required><option value="">Pilih satuan</option><option value="gram">gram</option><option value="ml">ml</option><option value="pcs">pcs</option></select><small>Gunakan satuan dasar untuk resep dan stok.</small></label><label>Stok minimum<input name="minimum_stock" type="number" min="0" step="any" value="0" required><small>Peringatan saat stok mencapai batas ini.</small></label></div><div class="ingredient-stock-note"><strong>Stok awal: 0</strong><span>Harga rata-rata: Rp0</span><p>Stok dan harga tidak diisi di sini. Buat pembelian di menu Purchasing agar stok, average cost, dan riwayat pembelian tercatat dengan benar.</p></div><div class="editor-actions"><button type="button" class="secondary-button" id="cancelIngredientEditor">Batal</button><button type="submit" class="primary-button" id="saveIngredientButton">Simpan bahan</button></div><p class="editor-message" id="ingredientEditorMessage"></p></form></div>';
- const close=()=>{editorOverlay.remove();host.innerHTML="";};
- document.querySelector("#closeIngredientEditor").onclick=close;
- document.querySelector("#cancelIngredientEditor").onclick=close;
- document.querySelector("#ingredientForm").onsubmit=async event=>{
+ const overlay=host.firstElementChild;
+ document.body.appendChild(overlay);
+ const close=()=>{overlay.remove();host.replaceChildren();document.body.classList.remove("ingredient-editor-open");};
+ document.body.classList.add("ingredient-editor-open");
+ overlay.addEventListener("click",event=>{if(event.target===overlay)close();});
+ overlay.querySelector("#closeIngredientEditor").onclick=event=>{event.preventDefault();close();};
+ overlay.querySelector("#cancelIngredientEditor").onclick=event=>{event.preventDefault();close();};
+ overlay.querySelector("#ingredientForm").onsubmit=async event=>{
   event.preventDefault();
-  const form=event.currentTarget,button=document.querySelector("#saveIngredientButton"),message=document.querySelector("#ingredientEditorMessage"),fd=new FormData(form);
+  const form=event.currentTarget,button=overlay.querySelector("#saveIngredientButton"),message=overlay.querySelector("#ingredientEditorMessage"),fd=new FormData(form);
   const payload={sku:String(fd.get("sku")||"").trim().toUpperCase(),name:String(fd.get("name")||"").trim(),unit:String(fd.get("unit")||""),stock_quantity:0,minimum_stock:Number(fd.get("minimum_stock")),average_cost:0,is_active:true};
   if(!payload.sku||!payload.name||!["gram","ml","pcs"].includes(payload.unit)||!Number.isFinite(payload.minimum_stock)||payload.minimum_stock<0){message.textContent="Periksa kembali SKU, nama, satuan, dan stok minimum.";return;}
   button.disabled=true;button.textContent="Menyimpan...";
