@@ -350,24 +350,96 @@ async function loadInventory(){
 async function loadCostRecipe(){
  const page=document.querySelector("#pageContent");
  if(currentRole!=="owner"){page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID</div><h1>Cost & Recipe</h1><p>Pengelolaan HPP dan resep hanya tersedia untuk Owner.</p></div></div><div class="panel"><h2>Akses Owner diperlukan</h2><p>Kasir tidak dapat mengubah HPP atau resep.</p></div>';return;}
- page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID · COST CONTROL</div><h1>Cost & Recipe</h1><p>Pantau HPP per produk berdasarkan average cost bahan baku.</p></div><button class="secondary-button" id="refreshCostRecipe">↻ Refresh</button></div><div class="panel">Menghitung HPP produk...</div>';
- const {data:products,error}=await supabaseClient.from("products").select("id,sku,name,is_active").eq("is_active",true).order("name");
- if(error){page.innerHTML='<div class="panel"><h2>Gagal memuat produk</h2><p>'+escapeHtml(error.message)+'</p><button class="secondary-button" id="retryCostRecipe">Coba lagi</button></div>';document.querySelector("#retryCostRecipe").onclick=loadCostRecipe;return;}
- const results=await Promise.all((products||[]).map(async p=>{
+ page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID · COST CONTROL</div><h1>Cost & Recipe</h1><p>Kelola komposisi resep dan pantau HPP berdasarkan average cost bahan baku.</p></div><button class="secondary-button" id="refreshCostRecipe">↻ Refresh</button></div><div class="panel">Memuat resep dan menghitung HPP...</div>';
+ const [productResult,ingredientResult,recipeResult]=await Promise.all([
+  supabaseClient.from("products").select("id,sku,name,is_active").eq("is_active",true).order("name"),
+  supabaseClient.from("ingredients").select("id,sku,name,unit,stock_quantity,average_cost,is_active").eq("is_active",true).order("name"),
+  supabaseClient.from("recipes").select("id,product_id,name,version,is_active").eq("is_active",true)
+ ]);
+ const loadError=productResult.error||ingredientResult.error||recipeResult.error;
+ if(loadError){page.innerHTML='<div class="panel"><h2>Gagal memuat Cost & Recipe</h2><p>'+escapeHtml(loadError.message)+'</p><button class="secondary-button" id="retryCostRecipe">Coba lagi</button></div>';document.querySelector("#retryCostRecipe").onclick=loadCostRecipe;return;}
+ const products=productResult.data||[],ingredients=ingredientResult.data||[],recipes=recipeResult.data||[];
+ const recipeIds=recipes.map(x=>x.id);
+ let recipeLines=[];
+ if(recipeIds.length){
+  const lineResult=await supabaseClient.from("recipe_ingredients").select("id,recipe_id,ingredient_id,quantity,unit").in("recipe_id",recipeIds);
+  if(lineResult.error){page.innerHTML='<div class="panel"><h2>Gagal memuat detail resep</h2><p>'+escapeHtml(lineResult.error.message)+'</p><button class="secondary-button" id="retryCostRecipe">Coba lagi</button></div>';document.querySelector("#retryCostRecipe").onclick=loadCostRecipe;return;}
+  recipeLines=lineResult.data||[];
+ }
+ const recipeByProduct=new Map(recipes.map(x=>[x.product_id,x]));
+ const linesByRecipe=new Map();
+ recipeLines.forEach(x=>{if(!linesByRecipe.has(x.recipe_id))linesByRecipe.set(x.recipe_id,[]);linesByRecipe.get(x.recipe_id).push(x);});
+ const results=await Promise.all(products.map(async p=>{
   const r=await supabaseClient.rpc("calculate_product_hpp",{p_product_sku:p.sku});
-  if(r.error)return {product:p,error:r.error.message};
+  if(r.error)return {product:p,error:r.error.message,recipe:recipeByProduct.get(p.id)||null};
   const d=Array.isArray(r.data)?r.data[0]:r.data;
-  return {product:p,data:d||null};
+  return {product:p,data:d||null,recipe:recipeByProduct.get(p.id)||null};
  }));
- const ready=results.filter(x=>x.data&&x.data.hpp!==null&&!x.data.ingredients_with_missing_cost).length;
+ const ready=results.filter(x=>x.data&&x.data.hpp!==null&&!Number(x.data.ingredients_with_missing_cost)).length;
  const missing=results.length-ready;
  const total=results.reduce((n,x)=>n+(Number(x.data?.hpp)||0),0);
  const rows=results.map(x=>{
   const d=x.data,problem=x.error||(!d?"Resep belum tersedia":Number(d.ingredients_with_missing_cost)>0?"Ada bahan tanpa biaya":d.hpp===null?"HPP belum dapat dihitung":"");
-  return '<tr><td><strong>'+escapeHtml(x.product.name)+'</strong><small class="table-sub">'+escapeHtml(x.product.sku)+'</small></td><td>'+(d?escapeHtml(d.recipe_name||"—"):"—")+'</td><td>'+(d&&d.hpp!==null?'<strong>'+money(d.hpp)+'</strong>':'—')+'</td><td><span class="product-status '+(problem?'inactive':'')+'">'+(problem?escapeHtml(problem):'Siap')+'</span></td></tr>';
+  const version=x.recipe?'v'+x.recipe.version:'Belum ada';
+  return '<tr><td><strong>'+escapeHtml(x.product.name)+'</strong><small class="table-sub">'+escapeHtml(x.product.sku)+'</small></td><td>'+(d?escapeHtml(d.recipe_name||x.recipe?.name||"—"):"—")+'<small class="table-sub">'+version+'</small></td><td>'+(d&&d.hpp!==null?'<strong>'+money(d.hpp)+'</strong>':'—')+'</td><td><span class="product-status '+(problem?'inactive':'')+'">'+(problem?escapeHtml(problem):'Siap')+'</span></td><td><button class="table-action" data-recipe-edit="'+x.product.id+'">Edit resep</button></td></tr>';
  }).join("");
- page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID · COST CONTROL</div><h1>Cost & Recipe</h1><p>HPP dihitung otomatis dari average cost bahan baku dan takaran resep.</p></div><button class="secondary-button" id="refreshCostRecipe">↻ Refresh</button></div><div class="metric-grid"><article class="metric-card"><div class="metric-top"><span>Produk aktif</span></div><strong>'+results.length+'</strong><small class="muted">Menu terdaftar</small></article><article class="metric-card"><div class="metric-top"><span>HPP siap</span></div><strong>'+ready+'</strong><small class="muted">Semua bahan memiliki biaya</small></article><article class="metric-card"><div class="metric-top"><span>Perlu dilengkapi</span></div><strong>'+missing+'</strong><small class="muted">Resep atau biaya belum lengkap</small></article><article class="metric-card"><div class="metric-top"><span>Total HPP seluruh menu</span></div><strong>'+money(total)+'</strong><small class="muted">Jumlah HPP per satuan produk</small></article></div><div class="panel"><div class="panel-heading"><div><h2>HPP per produk</h2><p>Nilai dihitung ulang saat halaman dibuka atau di-refresh.</p></div></div><div class="table-wrap"><table class="data-table inventory-table"><thead><tr><th>Produk</th><th>Resep</th><th>HPP / unit</th><th>Status</th></tr></thead><tbody>'+(rows||'<tr><td colspan="4">Belum ada produk aktif.</td></tr>')+'</tbody></table></div></div><div class="panel cost-recipe-note"><h2>Pengelolaan resep</h2><p>Berikutnya kita aktifkan editor resep agar Owner bisa mengubah takaran bahan langsung dari aplikasi. Harga bahan tetap mengikuti pembelian dan average cost Inventory.</p></div>';
+ page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID · COST CONTROL</div><h1>Cost & Recipe</h1><p>HPP dihitung otomatis dari average cost bahan baku dan takaran resep.</p></div><button class="secondary-button" id="refreshCostRecipe">↻ Refresh</button></div><div class="metric-grid"><article class="metric-card"><div class="metric-top"><span>Produk aktif</span></div><strong>'+results.length+'</strong><small class="muted">Menu terdaftar</small></article><article class="metric-card"><div class="metric-top"><span>HPP siap</span></div><strong>'+ready+'</strong><small class="muted">Semua bahan memiliki biaya</small></article><article class="metric-card"><div class="metric-top"><span>Perlu dilengkapi</span></div><strong>'+missing+'</strong><small class="muted">Resep atau biaya belum lengkap</small></article><article class="metric-card"><div class="metric-top"><span>Total HPP seluruh menu</span></div><strong>'+money(total)+'</strong><small class="muted">Jumlah HPP per satuan produk</small></article></div><div class="panel"><div class="panel-heading"><div><h2>HPP dan resep per produk</h2><p>Edit komposisi untuk membuat versi resep berikutnya.</p></div></div><div class="table-wrap"><table class="data-table inventory-table"><thead><tr><th>Produk</th><th>Resep aktif</th><th>HPP / unit</th><th>Status</th><th>Aksi</th></tr></thead><tbody>'+(rows||'<tr><td colspan="5">Belum ada produk aktif.</td></tr>')+'</tbody></table></div></div><div class="panel cost-recipe-note"><h2>Riwayat versi</h2><p>Setiap penyimpanan membuat versi resep baru. Versi sebelumnya tetap tersimpan dan tidak dihapus. Harga bahan mengikuti pembelian dan average cost Inventory.</p></div><div id="recipeEditorHost"></div>';
  document.querySelector("#refreshCostRecipe").onclick=loadCostRecipe;
+ page.querySelectorAll("[data-recipe-edit]").forEach(button=>button.addEventListener("click",()=>{
+  const product=products.find(x=>x.id===button.dataset.recipeEdit);
+  const activeRecipe=recipeByProduct.get(product.id)||null;
+  const currentLines=activeRecipe?(linesByRecipe.get(activeRecipe.id)||[]):[];
+  openRecipeEditor(product,ingredients,activeRecipe,currentLines);
+ }));
+}
+
+function openRecipeEditor(product,ingredients,activeRecipe,currentLines){
+ const host=document.querySelector("#recipeEditorHost");
+ if(!host)return;
+ const initial=currentLines.length?currentLines.map(x=>({ingredient_id:x.ingredient_id,quantity:x.quantity,unit:x.unit})):[];
+ let items=initial.length?initial:[{ingredient_id:"",quantity:"",unit:""}];
+ const options='<option value="">Pilih bahan baku</option>'+ingredients.map(x=>'<option value="'+x.id+'">'+escapeHtml(x.name)+' · '+escapeHtml(x.unit)+'</option>').join("");
+ host.innerHTML='<div class="editor-backdrop recipe-editor-backdrop"><form class="recipe-editor" id="recipeEditorForm"><div class="editor-heading"><div><div class="eyebrow">RECIPE MANAGEMENT · '+escapeHtml(product.sku)+'</div><h2>Edit resep '+escapeHtml(product.name)+'</h2><p>'+(activeRecipe?'Versi aktif v'+activeRecipe.version:'Belum ada resep aktif · akan dibuat sebagai versi pertama')+'</p></div><button type="button" class="icon-close" id="closeRecipeEditor">×</button></div><label class="recipe-name-field">Nama resep<input name="recipe_name" required maxlength="100" value="'+escapeHtml(activeRecipe?.name||product.name+' - Standar')+'"></label><div class="recipe-lines-heading"><div><h3>Komposisi bahan</h3><p>Takaran menggunakan satuan dasar Inventory.</p></div><button type="button" class="secondary-button" id="addRecipeIngredient">＋ Tambah bahan</button></div><div id="recipeIngredientRows"></div><div class="recipe-editor-hint">Pastikan satuan takaran sesuai dengan satuan bahan baku. HPP akan dihitung ulang setelah resep disimpan.</div><div class="editor-actions"><button type="button" class="secondary-button" id="cancelRecipeEditor">Batal</button><button type="submit" class="primary-button" id="saveRecipeButton">Simpan versi resep</button></div><p class="editor-message" id="recipeEditorMessage"></p></form></div>';
+ const rowsHost=document.querySelector("#recipeIngredientRows");
+ const renderRows=()=>{
+  rowsHost.innerHTML=items.map((item,index)=>{
+   const selected=ingredients.find(x=>x.id===item.ingredient_id);
+   return '<div class="recipe-line" data-recipe-line="'+index+'"><label class="recipe-ingredient-field"><span>Bahan baku</span><select class="recipe-ingredient">'+options+'</select><small class="recipe-stock">'+(selected?'Stok: '+Number(selected.stock_quantity||0).toLocaleString("id-ID")+' '+escapeHtml(selected.unit)+' · '+money(selected.average_cost)+' / '+escapeHtml(selected.unit):'Pilih bahan untuk melihat stok dan biaya')+'</small></label><label class="recipe-quantity-field"><span>Takaran</span><input class="recipe-quantity" type="number" min="0.001" step="any" required placeholder="0" value="'+escapeHtml(item.quantity)+'"></label><label class="recipe-unit-field"><span>Satuan</span><input class="recipe-unit" value="'+escapeHtml(item.unit||selected?.unit||"")+'" readonly placeholder="Otomatis"></label><button type="button" class="remove-recipe-line" aria-label="Hapus bahan" '+(items.length===1?'disabled':'')+'>×</button></div>';
+  }).join("");
+  rowsHost.querySelectorAll(".recipe-line").forEach((row,index)=>{
+   const select=row.querySelector(".recipe-ingredient"),unit=row.querySelector(".recipe-unit"),stock=row.querySelector(".recipe-stock");
+   select.value=items[index].ingredient_id||"";
+   select.onchange=()=>{
+    const ingredient=ingredients.find(x=>x.id===select.value);
+    items[index].ingredient_id=select.value;items[index].unit=ingredient?.unit||"";
+    unit.value=ingredient?.unit||"";
+    stock.textContent=ingredient?'Stok: '+Number(ingredient.stock_quantity||0).toLocaleString("id-ID")+' '+ingredient.unit+' · '+money(ingredient.average_cost)+' / '+ingredient.unit:'Pilih bahan untuk melihat stok dan biaya';
+   };
+   row.querySelector(".recipe-quantity").oninput=e=>items[index].quantity=e.target.value;
+   row.querySelector(".remove-recipe-line").onclick=()=>{if(items.length>1){items.splice(index,1);renderRows();}};
+  });
+ };
+ const close=()=>{host.innerHTML="";};
+ document.querySelector("#closeRecipeEditor").onclick=close;
+ document.querySelector("#cancelRecipeEditor").onclick=close;
+ document.querySelector("#addRecipeIngredient").onclick=()=>{items.push({ingredient_id:"",quantity:"",unit:""});renderRows();};
+ renderRows();
+ document.querySelector("#recipeEditorForm").onsubmit=async event=>{
+  event.preventDefault();
+  const button=document.querySelector("#saveRecipeButton"),message=document.querySelector("#recipeEditorMessage");
+  const payload=items.map(x=>({ingredient_id:x.ingredient_id,quantity:Number(x.quantity),unit:x.unit}));
+  if(payload.some(x=>!x.ingredient_id||!Number.isFinite(x.quantity)||x.quantity<=0||!x.unit)){message.textContent="Pilih bahan dan isi takaran yang valid pada setiap baris.";return;}
+  if(new Set(payload.map(x=>x.ingredient_id)).size!==payload.length){message.textContent="Bahan yang sama hanya boleh dimasukkan satu kali.";return;}
+  button.disabled=true;button.textContent="Menyimpan...";
+  try{
+   const recipeName=String(new FormData(event.currentTarget).get("recipe_name")||"").trim();
+   const {data,error}=await supabaseClient.rpc("save_product_recipe",{p_product_id:product.id,p_recipe_name:recipeName,p_items:payload});
+   if(error)throw error;
+   if(!data?.success)throw new Error("Penyimpanan resep tidak berhasil.");
+   notify("Resep tersimpan sebagai versi v"+data.version+".");
+   await loadCostRecipe();
+  }catch(error){message.textContent="Gagal menyimpan resep: "+error.message;button.disabled=false;button.textContent="Simpan versi resep";}
+ };
 }
 
 function navigate(view){document.querySelector("#breadcrumbTitle").textContent=labels[view]||"Overview";document.querySelectorAll(".nav-link[data-view]").forEach(button=>button.classList.toggle("active",button.dataset.view===view));document.querySelector("#sidebar").classList.remove("open");if(view==="products"){loadProducts();return;}if(view==="pos"){loadPOS();return;}if(view==="orders"){loadOrders();return;}if(view==="purchasing"){loadPurchasing();return;}if(view==="inventory"){loadInventory();return;}if(view==="costRecipe"){loadCostRecipe();return;}if(view==="overview"){loadOverview();return;}if(view==="reports"){loadReports();return;}if(view!=="overview"){notify((labels[view]||view)+" module sedang disiapkan.");return;}}
