@@ -292,10 +292,13 @@ function openPurchaseEditor(ingredients,suppliers){
  const rows=document.querySelector("#purchaseLineRows");
  const packageChoices=(ingredient)=>{
   const name=(ingredient?.name||"").toLowerCase(),unit=ingredient?.unit||"";
-  if(name.includes("uht"))return [{label:"Kotak 1 liter",unit:"kotak",factor:1000},{label:"Karton 12 × 1 liter",unit:"karton",factor:12000},{label:"Mililiter",unit:"ml",factor:1}];
-  if(name.includes("susu kental manis")||name.includes("skm"))return [{label:"Kaleng 370 ml",unit:"kaleng",factor:370},{label:"Dus 48 × 370 ml",unit:"dus",factor:17760},{label:"Mililiter",unit:"ml",factor:1}];
+  if(name.includes("yakult"))return [{label:"Bungkus isi 6 pcs",unit:"bungkus-6",factor:6},{label:"Bungkus isi 5 pcs",unit:"bungkus-5",factor:5},{label:"Pcs",unit:"pcs",factor:1}];
+  if(name.includes("uht"))return [{label:"Kotak 1 liter",unit:"kotak",factor:1000},{label:"Karton 12 × 1 liter",unit:"karton",factor:12000},{label:"Liter",unit:"liter",factor:1000},{label:"Mililiter",unit:"ml",factor:1}];
+  if(name.includes("susu kental manis")||name.includes("skm"))return [{label:"Kaleng 370 ml",unit:"kaleng",factor:370},{label:"Dus 48 × 370 ml",unit:"dus",factor:17760},{label:"Liter",unit:"liter",factor:1000},{label:"Mililiter",unit:"ml",factor:1}];
   if(name.includes("matcha")||name.includes("bubuk"))return [{label:"Kilogram",unit:"kg",factor:1000},{label:"Gram",unit:"gram",factor:1}];
-  if(name.includes("es batu"))return [{label:"Kemasan 5 kg",unit:"kemasan-5kg",factor:5000},{label:"Kilogram",unit:"kg",factor:1000},{label:"Gram",unit:"gram",factor:1}];
+  if(name.includes("es batu"))return [{label:"Kemasan 5 kg",unit:"kemasan-5kg",factor:5000},{label:"Kotak 5 kg",unit:"kotak-5kg",factor:5000},{label:"Kilogram",unit:"kg",factor:1000},{label:"Gram",unit:"gram",factor:1}];
+  if(unit==="ml")return [{label:"Botol 1 liter",unit:"botol-1l",factor:1000},{label:"Botol 500 ml",unit:"botol-500ml",factor:500},{label:"Liter",unit:"liter",factor:1000},{label:"Mililiter",unit:"ml",factor:1}];
+  if(unit==="pcs")return [{label:"Pcs",unit:"pcs",factor:1},{label:"Kotak (isi tentukan di catatan)",unit:"kotak",factor:1},{label:"Dus (isi tentukan di catatan)",unit:"dus",factor:1},{label:"Bungkus (isi tentukan di catatan)",unit:"bungkus",factor:1}];
   return [{label:unit,unit:unit,factor:1}];
  };
  const updateRow=(row)=>{
