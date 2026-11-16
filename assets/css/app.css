@@ -1221,3 +1221,19 @@ input:focus,select:focus,textarea:focus,.pos-select:focus{outline:none;border-co
 #ownerLoginForm input:focus,#cashierLoginForm input:focus{border-color:#8fbd98;box-shadow:0 0 0 3px #e7f2e8}
 #cashierCode{text-transform:uppercase;letter-spacing:1px;font-weight:700}
 #cashierPin{letter-spacing:7px;font-size:19px!important;font-weight:800}
+
+/* Owner cashier access management */
+.cashier-create-form{display:grid;grid-template-columns:1.4fr 1fr 1fr auto;gap:12px;align-items:end}
+.cashier-create-form label{display:grid;gap:7px;font-size:12px;font-weight:700;color:#526B54}
+.cashier-create-form input{width:100%;height:44px;padding:0 12px;border:1px solid #DDE8DA;border-radius:11px;background:#fff}
+.cashier-create-form button{height:44px;white-space:nowrap}
+.cashier-create-form .editor-message{grid-column:1/-1;margin:0}
+.cashier-list{display:grid;gap:9px}
+.cashier-row{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;padding:13px 15px;border:1px solid rgba(126,153,127,.16);border-radius:12px;background:rgba(247,250,246,.8)}
+.cashier-row strong,.cashier-row small{display:block}
+.cashier-row small{margin-top:3px;color:#839184;font-size:11px}
+.cashier-status{padding:5px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.cashier-status.active{background:#E5F2E5;color:#56845B}
+.cashier-status.inactive{background:#F8E8E7;color:#AD6E64}
+@media(max-width:850px){.cashier-create-form{grid-template-columns:1fr 1fr}.cashier-create-form button{grid-column:1/-1}}
+@media(max-width:520px){.cashier-create-form{grid-template-columns:1fr}.cashier-create-form button{grid-column:auto}.cashier-row{grid-template-columns:1fr auto}.cashier-row button{grid-column:1/-1;width:100%}}
