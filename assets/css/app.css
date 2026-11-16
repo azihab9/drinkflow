@@ -1172,3 +1172,28 @@ input:focus,select:focus,textarea:focus,.pos-select:focus{outline:none;border-co
 @media(prefers-reduced-transparency:reduce){
  .sidebar,.topbar,.panel,.metric-card{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:#fff!important}
 }
+
+
+/* Recipe editor modal portal — centered above all glass surfaces */
+.recipe-editor-backdrop{
+ position:fixed!important;inset:0!important;z-index:10050!important;
+ display:grid!important;place-items:center!important;
+ padding:20px!important;overflow-y:auto!important;
+ background:rgba(37,53,39,.38)!important;
+ -webkit-backdrop-filter:blur(12px) saturate(125%)!important;
+ backdrop-filter:blur(12px) saturate(125%)!important;
+}
+.recipe-editor-backdrop .recipe-editor{
+ position:relative!important;z-index:10051!important;
+ width:min(100%,760px)!important;max-height:min(88vh,900px)!important;
+ max-height:min(88dvh,900px)!important;overflow-y:auto!important;
+ overscroll-behavior:contain!important;
+ background:rgba(255,255,255,.97)!important;
+ border:1px solid rgba(255,255,255,.9)!important;
+ box-shadow:0 28px 90px rgba(42,62,43,.24)!important;
+ -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+}
+@media(max-width:650px){
+ .recipe-editor-backdrop{align-items:end!important;padding:10px!important;padding-bottom:calc(10px + env(safe-area-inset-bottom))!important}
+ .recipe-editor-backdrop .recipe-editor{width:100%!important;max-height:90vh!important;max-height:90dvh!important;border-radius:20px!important;padding:19px!important}
+}
