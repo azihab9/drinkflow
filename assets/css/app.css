@@ -202,3 +202,6 @@ footer{color:#8b978e}
 .purchase-line-input{grid-template-columns:minmax(145px,1.2fr) minmax(130px,1fr) minmax(95px,.7fr) minmax(125px,1fr) minmax(190px,1.3fr) 32px}
 .purchase-line-input .purchase-unit{white-space:normal;line-height:1.45;padding:0 2px 8px}
 @media(max-width:850px){.purchase-line-input{grid-template-columns:1fr 1fr}.purchase-line-input label:first-child{grid-column:1/-1}.purchase-line-input .purchase-unit{grid-column:1/-1}.purchase-line-input .remove-purchase-line{grid-column:2;justify-self:end}}
+
+.cost-recipe-note{margin-top:16px}
+.cost-recipe-note p{color:var(--muted);line-height:1.65;margin:8px 0 0}
