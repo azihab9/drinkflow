@@ -205,3 +205,30 @@ footer{color:#8b978e}
 
 .cost-recipe-note{margin-top:16px}
 .cost-recipe-note p{color:var(--muted);line-height:1.65;margin:8px 0 0}
+
+
+/* Owner recipe editor */
+.recipe-editor{width:min(100%,760px);max-height:calc(100vh - 36px);overflow:auto;background:#fff;border:1px solid #e1eae1;border-radius:18px;padding:26px;box-shadow:0 24px 90px rgba(25,50,30,.2);color:#203327}
+.recipe-name-field{display:grid;gap:7px;margin:8px 0 22px;color:#526357;font-size:12px;font-weight:700}
+.recipe-name-field input,.recipe-line input,.recipe-line select{width:100%;min-width:0;border:1px solid #dce7dc;border-radius:8px;padding:10px 11px;background:#fbfdfb;color:#203327;font:13px "DM Sans",sans-serif;outline:none}
+.recipe-name-field input:focus,.recipe-line input:focus,.recipe-line select:focus{border-color:#8fbd98;box-shadow:0 0 0 3px #e8f3e9}
+.recipe-lines-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.recipe-lines-heading h3{font:700 14px Manrope,sans-serif;margin:0 0 4px}
+.recipe-lines-heading p{font-size:11px;color:#819087;margin:0}
+.recipe-line{display:grid;grid-template-columns:minmax(180px,1.5fr) minmax(100px,.7fr) minmax(90px,.65fr) 34px;gap:10px;align-items:end;padding:12px;margin-bottom:9px;border:1px solid #e7eee7;border-radius:10px;background:#f8fbf8}
+.recipe-line label{display:grid;gap:6px;color:#68786b;font-size:11px;font-weight:700}
+.recipe-line small{min-height:14px;color:#829086;font-size:10px;font-weight:400;line-height:1.4}
+.recipe-line .recipe-unit{background:#f0f5f0;color:#617264}
+.remove-recipe-line{width:32px;height:36px;border:1px solid #eadfdd;border-radius:8px;background:#fff8f7;color:#a45f55;font-size:19px}
+.remove-recipe-line:disabled{opacity:.35;cursor:not-allowed}
+.recipe-editor-hint{margin-top:14px;padding:11px 13px;border-radius:9px;background:#f1f7f1;color:#718075;font-size:11px;line-height:1.6}
+.recipe-editor .editor-actions{margin-top:20px}
+.recipe-editor .editor-message{color:#ad5145}
+@media(max-width:650px){
+ .recipe-editor{padding:19px;max-height:calc(100vh - 20px)}
+ .recipe-line{grid-template-columns:1fr 1fr;gap:9px}
+ .recipe-ingredient-field{grid-column:1/-1}
+ .recipe-line .remove-recipe-line{justify-self:end}
+ .recipe-lines-heading{align-items:flex-start;flex-direction:column}
+ .recipe-lines-heading .secondary-button{width:100%}
+}
