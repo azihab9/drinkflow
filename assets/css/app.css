@@ -604,3 +604,27 @@ body{background:#fff!important;color:#26382F}
 .date-chip{background:#fff!important;border-color:#E7EAE5!important}
 .data-table tbody tr:nth-child(even){background:#FAFBFA}
 @media(max-width:760px){body{background:#fff!important}.main-area,.page-content{background:#fff}}
+
+/* Soft botanical green refinement */
+:root{--df-evergreen:#527B63;--df-evergreen-deep:#3F6650;--df-green-soft:#DCE9DF;--df-green-pale:#EEF4EF}
+.sidebar{background:linear-gradient(180deg,#557D65,#476F57)!important}
+.brand-mark{background:#DCE9DF!important;color:#476F57!important}
+.nav-link{color:#EAF1EB}
+.nav-link.active{background:#E4EEE5!important;color:#3F6650!important;box-shadow:inset 3px 0 #D8794A!important}
+.primary-button{background:#6F967B!important;color:#fff!important;box-shadow:0 7px 18px rgba(82,123,99,.16)!important}
+.primary-button:hover{background:#527B63!important}
+.metric-card,.metric-card:nth-child(1),.metric-card:nth-child(4){background:linear-gradient(135deg,#668C72,#86A991)!important}
+.metric-card:nth-child(2){background:linear-gradient(135deg,#C97D59,#D99A79)!important}
+.metric-card:nth-child(3){background:linear-gradient(135deg,#8175A0,#A094B9)!important}
+.channel-badge,.channel-row:nth-child(n) .channel-badge{background:#EAF1EB!important;color:#527B63!important}
+.getting-started{background:linear-gradient(120deg,#EEF4EF,#F8F5EF)!important;border-color:#E2EAE3!important}
+.setup-progress{background:#E3EBE4!important}.setup-progress span{background:#86A991!important}
+.product-item,.product-item:nth-child(n){background:#F5F8F5!important;border-color:#E3EBE4!important}
+.product-item span:last-child,.text-button{color:#668C72!important}
+.pos-product,.pos-product:nth-child(n){border-color:#E2EAE3!important}
+.data-table th{background:#EEF4EF!important;color:#527B63!important}
+.data-table tbody tr:hover{background:#F2F6F2!important}
+.secondary-button{background:#EEF4EF!important;border-color:#DCE8DE!important;color:#527B63!important}
+.secondary-button:hover{background:#DCE9DF!important;border-color:#BFD3C3!important}
+.welcome-row .eyebrow{background:#EEF4EF!important;border-color:#DCE8DE!important;color:#527B63!important}
+.welcome-row h1 em{color:#668C72!important}
