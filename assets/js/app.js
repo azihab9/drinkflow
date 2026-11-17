@@ -277,11 +277,11 @@ async function submitSale(){
   const payload={p_channel_code:posState.channel.code,p_payment_method:document.querySelector("#paymentMethod").value,p_items:posState.cart.map(x=>({product_id:x.product.id,quantity:x.quantity})),p_notes:document.querySelector("#saleNotes").value.trim()||null};
   const {data,error}=await supabaseClient.rpc("create_sale",payload);
   if(error)throw error;
-  posState.cart=[];notify("Pesanan tersimpan. Menunggu konfirmasi pembayaran.");await loadOrders();
+  posState.cart=[];notify("Pesanan tersimpan. Struk siap dicetak atau dibagikan.");await loadOrders(true);
  }catch(error){notify("Transaksi gagal: "+error.message);button.disabled=false;button.textContent="Simpan transaksi";}
 }
 
-async function loadOrders(){
+async function loadOrders(openLatestReceipt=false){
  const page=document.querySelector("#pageContent");
  page.innerHTML='<div class="welcome-row"><div><div class="eyebrow">MATCHABOY PASID</div><h1>Orders</h1><p>Daftar transaksi dan konfirmasi pembayaran.</p></div><button class="secondary-button" id="refreshOrders">↻ Refresh</button></div><div class="panel">Memuat transaksi...</div>';
  const [orderResult,channelResult]=await Promise.all([
@@ -313,6 +313,7 @@ async function loadOrders(){
  document.querySelector("#refreshOrders").addEventListener("click",loadOrders);
  document.querySelectorAll("[data-view-receipt]").forEach(b=>b.addEventListener("click",()=>showOrderReceipt(b.dataset.viewReceipt,orders, itemMap, channelMap)));
  document.querySelectorAll("[data-confirm-order]").forEach(b=>b.addEventListener("click",()=>confirmPayment(b.dataset.confirmOrder,b)));
+ if(openLatestReceipt&&orders.length)showOrderReceipt(orders[0].id,orders,itemMap,channelMap);
 }
 function showOrderReceipt(orderId,orders,itemMap,channelMap){
  const order=orders.find(x=>x.id===orderId);if(!order){notify("Data transaksi tidak ditemukan.");return;}
