@@ -318,7 +318,7 @@ async function loadOrders(openLatestReceipt=false){
 function showOrderReceipt(orderId,orders,itemMap,channelMap){
  const order=orders.find(x=>x.id===orderId);if(!order){notify("Data transaksi tidak ditemukan.");return;}
  const lines=itemMap.get(order.id)||[];
- const date=order.created_at?new Intl.DateTimeFormat("id-ID",{dateStyle:"full",timeStyle:"short",timeZone:"Asia/Jakarta"}).format(new Date(order.created_at)):"—";
+ const date=order.created_at?new Intl.DateTimeFormat("id-ID",{weekday:"short",day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",timeZone:"Asia/Jakarta"}).format(new Date(order.created_at)):"—";
  const payment={cash:"Tunai",qris:"QRIS",transfer:"Transfer"}[order.payment_method]||order.payment_method||"—";
  const status={pending:"Menunggu pembayaran",processing:"Diproses",completed:"Selesai",cancelled:"Dibatalkan"}[order.order_status]||order.order_status;
  const host=document.createElement("div");host.className="receipt-backdrop";host.id="receiptModal";
